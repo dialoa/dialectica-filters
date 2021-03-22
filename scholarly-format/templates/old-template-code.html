@@ -1,0 +1,14 @@
+<div class="authorsline">
+$for(author)$
+$if(author.isfirst)$$elseif(author.islast)$, $localize.lastand$ $else$, $endif$
+$if(author.ORCID)$<img src="ORCID.png" alt="ORCID link" />$endif$<span class="authorname">$author.name$</span>$if(author.institute)$, 
+$for(author.institute)$
+<span class="institutename">$author.institute$</span>$sep$,
+$endfor$$endif$$endfor$.
+</div>
+
+<h1>One-line list of affiliations</h1>
+
+<div class="affiliationsline">
+$for(institute)$$institute.name$$sep$, $endfor$
+</div>

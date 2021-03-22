@@ -1,0 +1,36 @@
+\documentclass{article}
+
+\title{Typesetting journal metadata with Pandoc templates and the scholarly Lua filters}
+
+\RequirePackage{hyperref}
+\RequirePackage{graphicx}
+
+% format author name
+\newcommand{\authornameformat}[1]{{\scshape #1}}
+% format orcid (requires graphicx)
+\newcommand{\orcidformat}[1]{\href{https://orcid.org/#1}{
+	\includegraphics[height=.6\baselineskip]{templates/ORCIDiD_logo120x120.png}#1}
+}
+\newenvironment{fullauthorblocks}
+	{\setlength{\parindent}{0pt}}
+	{}
+\newenvironment{fullauthorblock}
+	{}{\vskip \baselineskip}
+
+\begin{document}
+
+\maketitle
+
+\section{Full author blocks}
+
+\begin{fullauthorblocks}
+$for(author)$\begin{fullauthorblock}
+\authornameformat{$author.name$}%
+$if(author.ORCID)$\\ \orcidformat{$author.ORCID$}%$endif$%
+$if(author.institutename)$\\ $for(author.institutename)$$author.institutename$$sep$\\ $endfor$$endif$%
+$if(author.correspondence)$\\ $if(author.email)$\url{$author.email$}$endif$$endif$%
+\end{fullauthorblock}
+$endfor$
+\end{fullauthorblocks}
+
+\end{document}

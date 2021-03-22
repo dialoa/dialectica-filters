@@ -1,25 +1,43 @@
 <html>
 <head>
-<title>Templates for author blocks</title>
+<title>Typesetting journal metadata with Pandoc templates and the scholarly Lua filters</title>
 </head>
 <body>
 
+<h1>One full block per author</h1>
+
+<div class="author-blocks">
+$for(author)$
+<div class="author-block">
+<span class="author-name">$author.name$</span>
+$if(author.ORCID)$<br/>
+<span class="author-ORCID"><img src="templates/ORCID.png" alt="ORCID link" />$author.ORCID$</span>$endif$
+$if(author.institutename)$<br/>
+$for(author.institutename)$<span class="institute-name">$author.institutename$</span>$sep$<br/>$endfor$
+$endif$
+$if(author.correspondence)$<br/>
+$if(author.email)$<span class="author-email">$author.email$</span>$endif$
+$endif$
+</div>
+$endfor$
+
 <h1>One-line list of authors</h1>
 
-<div class="authorsline">
+<div class="authors-line">
 $for(author)$
 $if(author.isfirst)$$elseif(author.islast)$, $localize.lastand$ $else$, $endif$
-$if(author.ORCID)$<img src="ORCID.png" alt="ORCID link" />$endif$<span class="authorname">$author.name$</span>$if(author.institute)$, 
-$for(author.institute)$
-<span class="institutename">$author.institute$</span>$sep$,
+$if(author.ORCID)$<img src="templates/ORCID.png" alt="ORCID link" />$endif$<span class="author-name">$author.name$</span>$if(author.institutename)$, 
+$for(author.institutename)$
+<span class="institute-name">$author.institutename$</span>$sep$,
 $endfor$$endif$$endfor$.
 </div>
 
 <h1>One-line list of affiliations</h1>
 
-<div class="affiliationsline">
+<div class="affiliations-line">
 $for(institute)$$institute.name$$sep$, $endfor$
 </div>
+
 
 </body>
 </html>

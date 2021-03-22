@@ -1,7 +1,7 @@
 --[[-- # Scholarly-format - a Pandoc Lua filter for creating academic
 	journal templates
 
-To be used in tandem with Albert Krewinkel's scholarly-metadata filter. 
+To be used with (and after) the scholarly-metadata filter. 
 
 This filter populates the document with pre-formatted metadata 
 information that can be used by custom Pandoc templates to typeset
@@ -14,11 +14,34 @@ journal articles.
 
 ]]
 
+local List = pandoc.List
 
+local function process(meta)
 
+	-- localize the last 'and' in lists
+	meta.localize = {
+		lastand = pandoc.MetaInlines(pandoc.Str('&')),
+	}
+
+	-- add institutename list to the metadata `author` field
+	-- assumes that the author field is a list
+	meta.author = List:new(meta.author):map(
+		function (author)
+			author.institutename = List:new(author.institute):map(
+				function (institute_index)
+					return meta.institute[tonumber(institute_index)].name
+				end
+			)
+			return author
+		end
+		)
+
+	return meta
+
+end
 
 --- Main code
--- return the filter
-return {
-	Meta = process_meta
-}
+-- process the meta element
+function Meta(meta)
+	return process(meta)
+end
