@@ -72,7 +72,7 @@ Author and institution list, as in pandoc's scholarly-metadata.
 
 - author:
     + id: String. (mandatory, not sure what it's for, automatically generated based on the name)
-    + name: Inlines. (mandatory) NB, we could offer a map option here (first name, last name)
+    + name: Inlines. (mandatory) NB, we could offer a map option here (first name, last name).
     + institute: list of Indices. (to the institute table below) (optional)
     + email: String. (optional) 
     + correspondence: boolean (optional)

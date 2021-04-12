@@ -7,6 +7,8 @@ author:
   id: Jane Doe
   institute:
   - 1
+  institutename:
+  - Federation of Planets
   isfirst: true
   name: Jane Doe
   ORCID: 000111-22222-33333-44444
@@ -16,10 +18,15 @@ author:
   institute:
   - 1
   - 2
+  institutename:
+  - Federation of Planets
+  - Acme Corporation
   name: John Q. Doe
 - id: Juan Pérez
   institute:
   - 2
+  institutename:
+  - Acme Corporation
   islast: true
   name: Juan Pérez
 institute:

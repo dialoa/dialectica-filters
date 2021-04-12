@@ -5,7 +5,6 @@ author:
   email: 'jane.doe\@example.com'
   ORCID: '000111-22222-33333-44444'
   equal_contributor: yes
-  id: Jane Doe
   institute:
   - federation
   name: Jane Doe

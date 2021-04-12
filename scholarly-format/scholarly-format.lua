@@ -3,8 +3,8 @@
 
 To be used with (and after) the scholarly-metadata filter. 
 
-This filter populates the document with pre-formatted metadata 
-information that can be used by custom Pandoc templates to typeset
+This filter populates a document's metadata with pre-formatted 
+fields that can be used by custom Pandoc templates to typeset
 journal articles. 
 
 @author Julien Dutant <julien.dutant@kcl.ac.uk>

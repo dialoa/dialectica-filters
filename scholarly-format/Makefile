@@ -1,5 +1,6 @@
 PHONY: html tex
 
+all: sample.html sample.tex sample.pdf sample.json sample.native processed.md
 html: sample.html 
 tex: sample.tex 
 pdf: sample.pdf

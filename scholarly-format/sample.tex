@@ -2,26 +2,47 @@
 
 \title{Typesetting journal metadata with Pandoc templates and the scholarly Lua filters}
 
+\RequirePackage{hyperref}
+\RequirePackage{graphicx}
+
+% format author name
+\newcommand{\authornameformat}[1]{{\scshape #1}}
+% format orcid (requires graphicx)
+\newcommand{\orcidformat}[1]{\href{https://orcid.org/#1}{
+	\includegraphics[height=.6\baselineskip]{templates/ORCIDiD_logo120x120.png}#1}
+}
+\newenvironment{fullauthorblocks}
+	{\setlength{\parindent}{0pt}}
+	{}
+\newenvironment{fullauthorblock}
+	{}{\vskip \baselineskip}
+
 \begin{document}
 
 \maketitle
 
 \section{Full author blocks}
 
-{\scshape Jane Doe}%
-\\ORCID: 000111-22222-33333-44444%%
-\\Federation of Planets%
-\\\href{jane.doe@example.com}{mailto:jane.doe@example.com}%
+\begin{fullauthorblocks}
+\begin{fullauthorblock}
+\authornameformat{Jane Doe}%
+\\ \orcidformat{000111-22222-33333-44444}%%
+\\ Federation of Planets%
+\\ \url{jane.doe@example.com}%
+\end{fullauthorblock}
+\begin{fullauthorblock}
+\authornameformat{John Q. Doe}%
+%
+\\ Federation of Planets\\ Acme Corporation%
+%
+\end{fullauthorblock}
+\begin{fullauthorblock}
+\authornameformat{Juan Pérez}%
+%
+\\ Acme Corporation%
+%
+\end{fullauthorblock}
 
-{\scshape John Q. Doe}%
-%
-\\Federation of Planets\\Acme Corporation%
-%
-
-{\scshape Juan Pérez}%
-%
-\\Acme Corporation%
-%
-
+\end{fullauthorblocks}
 
 \end{document}
