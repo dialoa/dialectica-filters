@@ -87,12 +87,17 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 \setlength{\parindent}{2em}
+\usepackage{lipsum}
+
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
 \begin{document}
 \maketitle
+
+This sample tests the filter on a document with a metadata
+header-includes of the MetaList type.
 
 First paragraph. In English-style typography, the first paragraph
 shouldn't have a first-line indent, nor the paragraphs below headers.
