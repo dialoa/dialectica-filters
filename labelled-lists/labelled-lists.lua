@@ -37,18 +37,12 @@ end
 -- @param type string INFO, WARNING, ERROR
 -- @param text string text of the message
 function message(type, text)
-
-    local level = {
-        INFO = 0,
-        WARNING = 1,
-        ERROR = 2
-    }
-
-    if levels[type] == nil then type = 'ERROR' end
-
-    if levels[PANDOC_STATE.verbosity] <= levels[level]
-
-    if PANDOC_STATE.verbosity == 
+    local level = {INFO = 0, WARNING = 1, ERROR = 2}
+    if level[type] == nil then type = 'ERROR' end
+    if level[PANDOC_STATE.verbosity] <= level[type] then
+        io.stderr:write('[' .. type .. '] Labelled-lists lua filter: ' 
+            .. text .. '\n')
+    end
 end
 
 -- # Filter functions
@@ -74,18 +68,22 @@ function build_list(element)
     for _,blocks in ipairs(element.c) do
 
         local span = blocks[1].c[1]
+        blocks[1].c:remove(1)
         local label = span
         local id = ''
 
         if not (span.identifier == '') then
             if label_ids[span.identifier] then
                 message('WARNING', 'duplicate item identifier ' 
-                    .. span.identifier)
+                    .. span.identifier .. '. The second is ignored.')
             else
                 label_ids[span.identifier] = label
             end
-
         end
+
+        -- use this to check that the spans are removed
+        -- list:extend(blocks)
+
     end
 
     for k,v in pairs(label_ids) do
@@ -116,7 +114,9 @@ function is_custom_labelled_list (element)
     for _,blocks in ipairs(element.c) do
 
         -- check that the first element of the first block is Span
-        if not( blocks[1].c[1].t == 'Span' ) then
+        -- and not empty
+        if not( blocks[1].c[1].t == 'Span' ) or 
+            pandoc.utils.stringify(blocks[1].c[1].content) == '' then
             is_cl_list = false
             break 
         end

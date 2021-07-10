@@ -12,7 +12,10 @@ This is a filter for lists with custom labels.
 Here is the syntax for a list with custom labels:
 
 * [G1]{#G1ref} item
-* [G2]{ref=label} item
-* [G3]{#G1ref} item
+* [G2]{#G2ref} item
+  
+  block
+  
+* [G3]{ref=label} item
 
 Voilà. 
