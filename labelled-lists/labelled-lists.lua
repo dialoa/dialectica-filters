@@ -47,10 +47,18 @@ end
 
 -- # Filter functions
 
+-- style_label: style the label
+-- returns a styled label. Default: round brackets
+-- @param label Inlines an item's label as list of inlines
+function style_label(label)
+    label:insert(1, pandoc.Str('('))
+    label:insert(#label+1, pandoc.Str(')'))
+    return label
+end
+
 --- build_list: processes a custom label list
--- 
--- you need to return an item that's not a list, but
--- contains output format code for lists
+-- returns a list of blocks containing Raw output format code
+-- @param element BulletList the original Bullet List element
 function build_list(element)
 
     -- build a list of blocks
@@ -89,7 +97,7 @@ function build_list(element)
 
             inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
-            inlines:extend(label)
+            inlines:extend(style_label(label))
             inlines:insert(pandoc.RawInline('latex',']'))
             list:insert(pandoc.Plain(inlines))
 
@@ -97,7 +105,14 @@ function build_list(element)
 
         elseif FORMAT:match('html') then
 
-            -- TO BE CONTINUED
+            inlines = pandoc.List:new()
+            inlines:insert(pandoc.RawInline('html',
+                '<p><span class="labelled-lists-label>'))
+            inlines:extend(style_label(label))
+            inlines:insert(pandoc.RawInline('html','</span>'))
+            list:insert(pandoc.Plain(inlines))
+
+            list:extend(blocks)
 
         end
 
@@ -148,7 +163,6 @@ end
 function filter_list (element)
     
     if is_custom_labelled_list(element) then
-        print("found a cl list")
         return build_list(element)
     end
 

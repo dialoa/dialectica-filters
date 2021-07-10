@@ -1,21 +1,19 @@
 ---
-title: test labelled lists
-author: julien dutant
+title: tests for list structures
 ---
 
-# Introduction
+* item
 
-This is a filter for lists with custom labels.
+  more
 
-# Tests
+* item
 
-Here is the syntax for a list with custom labels:
+  more
 
-* [(**G1**)]{#G1ref} item
-* [G2]{#G2ref} item
-  
-  block
-
-* [G3]{ref=label} item
-
-Voilà. 
+* $$F(x) > G(x)$$
+* \textbf{some LaTeX}
+* see \textsc{some LaTeX}.
+* --------- ----------
+  test       table
+  another    line
+  --------- -----------
