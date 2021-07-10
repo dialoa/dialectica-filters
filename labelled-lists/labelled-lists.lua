@@ -93,15 +93,26 @@ function build_list(element)
             end
         end
 
+        -- if #blocks > 1 then print("found several blocks in an item") end
+
         if FORMAT:match('latex') then
 
             inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
             inlines:extend(style_label(label))
             inlines:insert(pandoc.RawInline('latex',']'))
-            list:insert(pandoc.Plain(inlines))
 
-            list:extend(blocks)
+            -- if the first block is Plain or Para, we insert
+            -- the label code at the beginning
+            -- otherwise we add a Plain block for the label
+            if blocks[1].t == 'Plain' or blocks[1].t == 'Para' then
+                inlines:extend(blocks[1].c)
+                blocks[1].c = inlines
+                list:extend(blocks)
+            else
+                list:insert(pandoc.Plain(inlines))
+                list:extend(blocks)
+            end
 
         elseif FORMAT:match('html') then
 

@@ -91,6 +91,11 @@ Ignored: these are not treated as labels.
 * [[All]{.smallcaps}]{} This list uses
 * [[Some]{.smallcaps}]{} latex code as labels.
 
+### List with Para items
+
+* [A1]{} $$F(x) > G(x)$$
+* [A2]{} $$G(x) > H(x)$$
+
 ### items with several blocks 
 * [**B1**]{} This list's items
 

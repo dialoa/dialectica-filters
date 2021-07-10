@@ -1,0 +1,269 @@
+Labelled-lists =======
+
+custom labelled lists in Pandoc's markdown.
+
+v0.1. Copyright: © 2021 Julien Dutant
+\href{mailto:julien.dutant@kcl.ac.uk}{\nolinkurl{julien.dutant@kcl.ac.uk}}
+License: MIT - see LICENSE file for details.
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+This filter provides custom labelled lists in Pandoc's markdown for
+outputs in LaTeX/PDF, HTML and JATS XML. Instead of bullets or numbers,
+list items are given custom text labels. The text labels can include
+markdown formatting.
+
+\hypertarget{usage}{%
+\subsection{Usage}\label{usage}}
+
+\hypertarget{loading-the-filter}{%
+\subsubsection{Loading the filter}\label{loading-the-filter}}
+
+The filter is loaded with the Pandoc \texttt{-L} or
+\texttt{-\/-lua-filter} option.
+
+\texttt{bash\ pandoc\ -L\ path/to/labelled-lists.lua\ source.md\ -o\ output.html}
+
+If the filter is in Pandoc's \texttt{\$DATADIR} there is no need to give
+its path. See {[}Pandoc's manual{[}
+(https://pandoc.org/MANUAL.html\#general-options) for details.
+
+\hypertarget{markdown-syntax}{%
+\subsubsection{Markdown syntax}\label{markdown-syntax}}
+
+A simple illustration of the custom label syntax:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Premise 1}\CommentTok{]}\NormalTok{\{\} This is the first claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Premise 2}\CommentTok{]}\NormalTok{\{\} This is the second claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Conclusion}\CommentTok{]}\NormalTok{\{\} This is the conclusion.}
+\end{Highlighting}
+\end{Shaded}
+
+This generates the following list (process this file with the filter to
+see the result):
+
+\begin{itemize}
+\tightlist
+
+\item[(Premise 1)]
+
+This is the first claim.
+
+\item[(Premise 2)]
+
+This is the second claim.
+
+\item[(Conclusion)]
+
+This is the conclusion.
+
+\end{itemize}
+
+In general, the filter will turn a bullet list into a custom label list
+provided that \emph{every item starts with a non-empty Span element}.
+
+\begin{itemize}
+\tightlist
+\item
+  A Span element is inline text (i.e., not block like a paragraph) that
+  optinally has some attributes. The default syntax is
+  \texttt{{[}inline\ text{]}\{attributes\}}. Inline text will be used as
+  label, placed within round bracket.
+\item
+  There is no need to specify attributes on the Span. But (in Pandoc's
+  default Span syntax) curly brackets must be present:
+  \texttt{{[}label{]}} won't work, \texttt{{[}label{]}\{\}} will.
+\item
+  For the purposes of this filter, a Span is \emph{non-empty} if its
+  inline text is not empty. Thus \texttt{{[}{]}\{\}} will not work.
+  Numbers or other unicode characters work. To generate an empty label,
+  use a space or other invisible character,
+  e.g.~\texttt{{[}\ {]}\ \ \ \{\}}. \emph{Exception}: math formulas will
+  work as labels, but if the inline text only contains LaTeX code
+  (\texttt{\textbackslash{}textsc\{a\}}) it will be treated as empty.
+\item
+  The label can include formatting. \texttt{{[}**T1**{]}\{\}} will
+  generate a label with strong emphasis (bold by default).
+\item
+  Alternative syntaxes for Span elements will work too. See {[}Pandoc
+  manual{]} (https://pandoc.org/MANUAL.html\#divs-and-spans) for
+  details.
+\end{itemize}
+
+\hypertarget{examples-and-tests}{%
+\subsection{Examples and tests}\label{examples-and-tests}}
+
+\hypertarget{math-formulas}{%
+\subsubsection{math formulas}\label{math-formulas}}
+
+\begin{itemize}
+\tightlist
+
+\item[(\(p_1\))]
+
+This list uses
+
+\item[(\(p_2\))]
+
+math formulas as labels.
+
+\end{itemize}
+
+\hypertarget{latex-code}{%
+\subsubsection{LaTeX code}\label{latex-code}}
+
+\begin{itemize}
+\tightlist
+\item
+  {\textbf{a}} This list uses
+\item
+  {\textbf{b}} latex code as labels.
+\end{itemize}
+
+Ignored: these are not treated as labels.
+
+\hypertarget{small-caps}{%
+\subsubsection{Small caps}\label{small-caps}}
+
+\begin{itemize}
+\tightlist
+
+\item[(\textsc{All})]
+
+This list uses
+
+\item[(\textsc{Some})]
+
+latex code as labels.
+
+\end{itemize}
+
+\hypertarget{list-with-para-items}{%
+\subsubsection{List with Para items}\label{list-with-para-items}}
+
+\begin{itemize}
+\tightlist
+
+\item[(A1)]
+
+\[F(x) > G(x)\]
+
+\item[(A2)]
+
+\[G(x) > H(x)\]
+
+\end{itemize}
+
+\hypertarget{items-with-several-blocks}{%
+\subsubsection{items with several
+blocks}\label{items-with-several-blocks}}
+
+\begin{itemize}
+\tightlist
+
+\item[(\textbf{B1})]
+
+This list's items
+
+consist of several blocks
+
+\[\sum_i Fi > \sum_i Gi\]
+
+\item[(\textbf{B2})]
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et massa
+ut eros volutpat gravida ut vel lacus. Proin turpis eros, imperdiet sed
+quam eget, bibendum aliquam massa. Phasellus pellentesque egestas
+dapibus. Proin porta tellus id orci consectetur bibendum. Nam eu cursus
+quam. Etiam vehicula in mi sed interdum. Duis rutrum eleifend
+consectetur. Phasellus ullamcorper, urna at vestibulum venenatis, tellus
+erat luctus nibh, eget hendrerit justo enim nec magna. Duis mollis ac
+felis ac tristique.
+
+Pellentesque malesuada arcu ac orci scelerisque vulputate. Aenean at ex
+suscipit, ultricies tellus sit amet, luctus lectus. Duis ut viverra
+sapien. Pellentesque habitant morbi tristique senectus et netus et
+malesuada fames ac turpis egestas. Cras consequat nisi at ex finibus, in
+condimentum erat auctor. In at nulla at est iaculis pulvinar sed id
+diam. Cras malesuada sit amet tellus id molestie.
+
+\end{itemize}
+
+\hypertarget{details}{%
+\subsection{Details}\label{details}}
+
+\hypertarget{latex-output}{%
+\subsubsection{LaTeX output}\label{latex-output}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{\textbackslash{}begin}\NormalTok{\{}\ExtensionTok{itemize}\NormalTok{\}}
+\FunctionTok{\textbackslash{}tightlist}
+
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 1)]}
+
+\NormalTok{This is the first claim.}
+
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 2)]}
+
+\NormalTok{This is the second claim.}
+
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Conclusion)]}
+
+\NormalTok{This is the conclusion.}
+
+\KeywordTok{\textbackslash{}end}\NormalTok{\{}\ExtensionTok{itemize}\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{html-output}{%
+\subsubsection{HTML output}\label{html-output}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}list"}\KeywordTok{\textgreater{}}
+    \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}}
+      \KeywordTok{\textless{}div\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 1)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ Text }
+\NormalTok{      of the item\textquotesingle{}s first block}\ErrorTok{\textless{}}\NormalTok{\textbackslash{}div\textgreater{}}
+      \KeywordTok{\textless{}p\textgreater{}}\NormalTok{text of the item\textquotesingle{}s second paragraph}\KeywordTok{\textless{}/p\textgreater{}}
+    \KeywordTok{\textless{}div\textgreater{}} 
+    \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}}
+      \KeywordTok{\textless{}div\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 2)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ Text }
+\NormalTok{      of the item\textquotesingle{}s first block}\ErrorTok{\textless{}}\NormalTok{\textbackslash{}div\textgreater{}}
+      \KeywordTok{\textless{}p\textgreater{}}\NormalTok{text of the item\textquotesingle{}s second paragraph}\KeywordTok{\textless{}/p\textgreater{}}
+    \KeywordTok{\textless{}div\textgreater{}} 
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{list-structures}{%
+\subsubsection{List structures}\label{list-structures}}
+
+\begin{itemize}
+\tightlist
+\item
+  In the Pandoc AST, each item is a list of blocks. If the item has only
+  one block, the list will contain only one element.
+\item
+  If an item has only one block, that block's type can be at least:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Plain, if it only contains straightforward markdown
+  \item
+    Para, if it contains some equation LaTeX code (and perhaps in other
+    cases too)
+  \item
+    Table if it contains a table.
+  \end{itemize}
+\item
+  It an item has several blocks, they will be Para by default, otherwise
+  of whatever type the block is.
+\item
+  If an item is only one block, it is either a Plain element (if it only
+  contains straightforward markdown) or a Para element (if it contains
+  some LaTeX code or equation)
+\end{itemize}
