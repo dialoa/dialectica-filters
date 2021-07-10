@@ -53,6 +53,7 @@ end
 -- contains output format code for lists
 function build_list(element)
 
+    -- build a list of blocks
     local list = pandoc.List:new()
 
     -- start
@@ -67,22 +68,38 @@ function build_list(element)
 
     for _,blocks in ipairs(element.c) do
 
+        -- get the span, remove it, extract content
         local span = blocks[1].c[1]
         blocks[1].c:remove(1)
-        local label = span
+        local label = span.content
         local id = ''
 
+        -- get identifier if not duplicate, store in global table
         if not (span.identifier == '') then
             if label_ids[span.identifier] then
                 message('WARNING', 'duplicate item identifier ' 
                     .. span.identifier .. '. The second is ignored.')
             else
                 label_ids[span.identifier] = label
+                id = span.identifier
             end
         end
 
-        -- use this to check that the spans are removed
-        -- list:extend(blocks)
+        if FORMAT:match('latex') then
+
+            inlines = pandoc.List:new()
+            inlines:insert(pandoc.RawInline('latex','\\item['))
+            inlines:extend(label)
+            inlines:insert(pandoc.RawInline('latex',']'))
+            list:insert(pandoc.Plain(inlines))
+
+            list:extend(blocks)
+
+        elseif FORMAT:match('html') then
+
+            -- TO BE CONTINUED
+
+        end
 
     end
 
