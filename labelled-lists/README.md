@@ -57,18 +57,18 @@ element*.
   that optinally has some attributes. The default syntax is `
   [inline text]{attributes}`. Inline text will be used as label, 
   placed within round bracket. 
-* There is no need to specify attributes on the Span. But (in Pandoc's
-  default Span syntax) curly brackets must be present: `[label]` won't 
-  work, `[label]{}` will.
+* There is no need to specify attributes on the Span. But curly
+  brackets must be present: `[label]` won't work, `[label]{}` will.
+* The label can include formatting. `[**T1**]{}` will generate a label with
+  strong emphasis (bold by default).
 * For the purposes of this filter, a Span is *non-empty* if its inline
   text is not empty. Thus `[]{}` will not work. Numbers or other unicode
   characters work. To generate an empty
   label, use a space or other invisible character, e.g. `[ ]
   {}`. *Exception*: math formulas will work as labels, but if the inline 
   text only contains LaTeX code (`\textsc{a}`) it will be treated as empty.
-* The label can include formatting. `[**T1**]{}` will generate a label with
-  strong emphasis (bold by default).
-* Alternative syntaxes for Span elements will work too. See [Pandoc manual]
+* Span elements can also be entered using HTML syntax: `<span>inline text
+  </span>`. See [Pandoc manual]
   (https://pandoc.org/MANUAL.html#divs-and-spans) for details. 
 
 Examples and tests

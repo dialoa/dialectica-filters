@@ -19,6 +19,13 @@ local target_formats = {
 -- table of indentified labels
 local label_ids = pandoc.List:new()
 
+-- html classes
+local html_classes = {
+    item = 'labelled-lists-item',
+    label = 'labelled-lists-label',
+    list = 'labelled-lists-list',
+}
+
 -- # Helper functions
 
 --- format_matches: Test whether the target format is in a given list.
@@ -70,7 +77,12 @@ function build_list(element)
         list:insert(pandoc.RawBlock('latex',
             '\\begin{itemize}\n\\tightlist'
             ))
+    elseif FORMAT:match('html') then
+        list:insert(pandoc.RawBlock('html',
+            '<div class="' .. html_classes['list'] .. '">'
+            ))
     end
+
 
     -- process each item
 
@@ -97,7 +109,7 @@ function build_list(element)
 
         if FORMAT:match('latex') then
 
-            inlines = pandoc.List:new()
+            local inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
             inlines:extend(style_label(label))
             inlines:insert(pandoc.RawInline('latex',']'))
@@ -116,22 +128,45 @@ function build_list(element)
 
         elseif FORMAT:match('html') then
 
-            inlines = pandoc.List:new()
-            inlines:insert(pandoc.RawInline('html',
-                '<p><span class="labelled-lists-label>'))
-            inlines:extend(style_label(label))
-            inlines:insert(pandoc.RawInline('html','</span>'))
-            list:insert(pandoc.Plain(inlines))
+            local label_span = pandoc.Span(style_label(label))
+            label_span.classes = { html_classes['label'] }
+            if id then label_span.identifier = id end
 
-            list:extend(blocks)
+            -- if there is only one block and it's Plain or Para,
+            -- we create the item as <p>, otherwise as <div>
+            if #blocks == 1 and 
+                (blocks[1].t == 'Plain' or blocks[1].t == 'Para') then
+                    local inlines = pandoc.List:new()
+                    inlines:insert(1, pandoc.RawInline('html', 
+                        '<p class="' .. html_classes['item'] .. '">'))
+                    inlines:insert(label_span)
+                    inlines:extend(blocks[1].c)
+                    inlines:insert(pandoc.RawInline('html', '</p>'))
+                    list:insert(pandoc.Plain(inlines))
+            else
+                -- if the first block is Plain or Para we insert the
+                -- label in it, otherwise the label is its own paragraph
+                if (blocks[1].t == 'Plain' or blocks[1].t == 'Para') then
+                    local inlines = pandoc.List:new()
+                    inlines:insert(label_span)
+                    inlines:extend(blocks[1].c)
+                    blocks[1].c = inlines
+                else
+                    blocks:insert(1, pandoc.Para(label_span))
+                end
 
+                list:insert(pandoc.Div(blocks,  
+                    { class = html_classes['item'] } ))        
+
+            end
+ 
         end
 
     end
 
-    for k,v in pairs(label_ids) do
-        print("id " .. k .. " label " .. pandoc.utils.stringify(v) )
-    end
+    -- for k,v in pairs(label_ids) do
+    --     print("id " .. k .. " label " .. pandoc.utils.stringify(v) )
+    -- end
 
 
     -- end
@@ -140,6 +175,8 @@ function build_list(element)
         list:insert(pandoc.RawBlock('latex',
             '\\end{itemize}\n'
             ))
+    elseif FORMAT:match('html') then
+        list:insert(pandoc.RawBlock('html','</div>'))        
     end
 
     return list

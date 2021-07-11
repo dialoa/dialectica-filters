@@ -14,39 +14,53 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Premise 2</span><span class="co">]</span>{} This is the second claim.</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Conclusion</span><span class="co">]</span>{} This is the conclusion.</span></code></pre></div>
 <p>This generates the following list (process this file with the filter to see the result):</p>
-<p><span class="labelled-lists-label>(Premise 1)</span>
- This is the first claim.
-<p><span class="labelled-lists-label>(Premise 2)</span>
- This is the second claim.
-<p><span class="labelled-lists-label>(Conclusion)</span>
- This is the conclusion.
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 1)</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 2)</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">(Conclusion)</span> This is the conclusion.</p>
+</div>
 <p>In general, the filter will turn a bullet list into a custom label list provided that <em>every item starts with a non-empty Span element</em>.</p>
 <ul>
 <li>A Span element is inline text (i.e., not block like a paragraph) that optinally has some attributes. The default syntax is <code>[inline text]{attributes}</code>. Inline text will be used as label, placed within round bracket.</li>
-<li>There is no need to specify attributes on the Span. But (in Pandoc’s default Span syntax) curly brackets must be present: <code>[label]</code> won’t work, <code>[label]{}</code> will.</li>
-<li>For the purposes of this filter, a Span is <em>non-empty</em> if its inline text is not empty. Thus <code>[]{}</code> will not work. Numbers or other unicode characters work. To generate an empty label, use a space or other invisible character, e.g. <code>[ ]   {}</code>. <em>To be tested</em>: not sure how the filter behaves with LaTeX code for inline text.</li>
+<li>There is no need to specify attributes on the Span. But curly brackets must be present: <code>[label]</code> won’t work, <code>[label]{}</code> will.</li>
 <li>The label can include formatting. <code>[**T1**]{}</code> will generate a label with strong emphasis (bold by default).</li>
-<li>Alternative syntaxes for Span elements will work too. See [Pandoc manual] (https://pandoc.org/MANUAL.html#divs-and-spans) for details.</li>
+<li>For the purposes of this filter, a Span is <em>non-empty</em> if its inline text is not empty. Thus <code>[]{}</code> will not work. Numbers or other unicode characters work. To generate an empty label, use a space or other invisible character, e.g. <code>[ ]   {}</code>. <em>Exception</em>: math formulas will work as labels, but if the inline text only contains LaTeX code (<code>\textsc{a}</code>) it will be treated as empty.</li>
+<li>Span elements can also be entered using HTML syntax: <code>&lt;span&gt;inline text   &lt;/span&gt;</code>. See [Pandoc manual] (https://pandoc.org/MANUAL.html#divs-and-spans) for details.</li>
 </ul>
 <h2 id="examples-and-tests">Examples and tests</h2>
 <h3 id="math-formulas">math formulas</h3>
-<p><span class="labelled-lists-label>(<span class="math inline"><em>p</em><sub>1</sub></span>)</span>
- This list uses
-<p><span class="labelled-lists-label>(<span class="math inline"><em>p</em><sub>2</sub></span>)</span>
- math formulas as labels.
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="math inline"><em>p</em><sub>1</sub></span>)</span> This list uses</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="math inline"><em>p</em><sub>2</sub></span>)</span> math formulas as labels.</p>
+</div>
 <h3 id="latex-code">LaTeX code</h3>
 <ul>
 <li><span></span> This list uses</li>
 <li><span></span> latex code as labels.</li>
 </ul>
+<p>Ignored: these are not treated as labels.</p>
+<h3 id="small-caps">Small caps</h3>
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="smallcaps">All</span>)</span> This list uses</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="smallcaps">Some</span>)</span> latex code as labels.</p>
+</div>
+<h3 id="list-with-para-items">List with Para items</h3>
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span class="labelled-lists-label">(A1)</span> <span class="math display"><em>F</em>(<em>x</em>) &gt; <em>G</em>(<em>x</em>)</span></p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">(A2)</span> <span class="math display"><em>G</em>(<em>x</em>) &gt; <em>H</em>(<em>x</em>)</span></p>
+</div>
 <h3 id="items-with-several-blocks">items with several blocks</h3>
-<p><span class="labelled-lists-label>(<strong>B1</strong>)</span>
-<p> This list’s items</p>
+<div class="labelled-lists-list">
+<div class="labelled-lists-item">
+<p><span class="labelled-lists-label">(<strong>B1</strong>)</span> This list’s items</p>
 <p>consist of several blocks</p>
 <p><span class="math display">∑<sub><em>i</em></sub><em>F</em><em>i</em> &gt; ∑<sub><em>i</em></sub><em>G</em><em>i</em></span></p>
-<p><span class="labelled-lists-label>(<strong>B2</strong>)</span>
-<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et massa ut eros volutpat gravida ut vel lacus. Proin turpis eros, imperdiet sed quam eget, bibendum aliquam massa. Phasellus pellentesque egestas dapibus. Proin porta tellus id orci consectetur bibendum. Nam eu cursus quam. Etiam vehicula in mi sed interdum. Duis rutrum eleifend consectetur. Phasellus ullamcorper, urna at vestibulum venenatis, tellus erat luctus nibh, eget hendrerit justo enim nec magna. Duis mollis ac felis ac tristique.</p>
+</div>
+<div class="labelled-lists-item">
+<p><span class="labelled-lists-label">(<strong>B2</strong>)</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et massa ut eros volutpat gravida ut vel lacus. Proin turpis eros, imperdiet sed quam eget, bibendum aliquam massa. Phasellus pellentesque egestas dapibus. Proin porta tellus id orci consectetur bibendum. Nam eu cursus quam. Etiam vehicula in mi sed interdum. Duis rutrum eleifend consectetur. Phasellus ullamcorper, urna at vestibulum venenatis, tellus erat luctus nibh, eget hendrerit justo enim nec magna. Duis mollis ac felis ac tristique.</p>
 <p>Pellentesque malesuada arcu ac orci scelerisque vulputate. Aenean at ex suscipit, ultricies tellus sit amet, luctus lectus. Duis ut viverra sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor. In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.</p>
+</div>
+</div>
 <h2 id="details">Details</h2>
 <h3 id="latex-output">LaTeX output</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">itemize</span>}</span>
@@ -68,5 +82,24 @@
 <h3 id="html-output">HTML output</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-list&quot;</span><span class="kw">&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    (Premise 1)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div&gt;</span> </span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;div&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 1)<span class="kw">&lt;/span&gt;</span> Text </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      of the item&#39;s first block<span class="er">&lt;</span>\div&gt;</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;p&gt;</span>text of the item&#39;s second paragraph<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div&gt;</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;div&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 2)<span class="kw">&lt;/span&gt;</span> Text </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      of the item&#39;s first block<span class="er">&lt;</span>\div&gt;</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;p&gt;</span>text of the item&#39;s second paragraph<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div&gt;</span> </span></code></pre></div>
+<h3 id="list-structures">List structures</h3>
+<ul>
+<li>In the Pandoc AST, each item is a list of blocks. If the item has only one block, the list will contain only one element.</li>
+<li>If an item has only one block, that block’s type can be at least:
+<ul>
+<li>Plain, if it only contains straightforward markdown</li>
+<li>Para, if it contains some equation LaTeX code (and perhaps in other cases too)</li>
+<li>Table if it contains a table.</li>
+</ul></li>
+<li>It an item has several blocks, they will be Para by default, otherwise of whatever type the block is.</li>
+<li>If an item is only one block, it is either a Plain element (if it only contains straightforward markdown) or a Para element (if it contains some LaTeX code or equation)</li>
+</ul>
