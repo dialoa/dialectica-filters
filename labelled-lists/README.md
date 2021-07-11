@@ -143,18 +143,18 @@ This is the conclusion.
 
 ### HTML output
 
+HTML output is a `<div>`. Each item is a `<p>` if it's one block long,
+  a `<div>` if longer. The label itself is contained in a `<span>`. 
+
 ```html
 <div class="labelled-lists-list">
-    <div class="labelled-lists-item">
-      <div><span class="labelled-lists-label">(Premise 1)</span> Text 
-      of the item's first block<\div>
-      <p>text of the item's second paragraph</p>
-    <div> 
-    <div class="labelled-lists-item">
-      <div><span class="labelled-lists-label">(Premise 2)</span> Text 
-      of the item's first block<\div>
-      <p>text of the item's second paragraph</p>
-    <div> 
+  <p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 1)</span> This is the first claim.</p>
+  <p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 2)</span> This is the second claim.</p>
+  <div class="labelled-lists-item">
+    <p><span class="labelled-lists-label">(<strong>Conclusion</strong>)</span> This third item consists of</p>
+    <p>two blocks.</p>
+  </div>
+</div>
 ```
 
 ### List structures

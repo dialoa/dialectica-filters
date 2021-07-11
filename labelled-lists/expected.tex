@@ -201,19 +201,21 @@ diam. Cras malesuada sit amet tellus id molestie.
 \hypertarget{html-output}{%
 \subsubsection{HTML output}\label{html-output}}
 
+HTML output is a \texttt{\textless{}div\textgreater{}}. Each item is a
+\texttt{\textless{}p\textgreater{}} if it's one block long, a
+\texttt{\textless{}div\textgreater{}} if longer. The label itself is
+contained in a \texttt{\textless{}span\textgreater{}}.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}list"}\KeywordTok{\textgreater{}}
-    \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}}
-      \KeywordTok{\textless{}div\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 1)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ Text }
-\NormalTok{      of the item\textquotesingle{}s first block}\ErrorTok{\textless{}}\NormalTok{\textbackslash{}div\textgreater{}}
-      \KeywordTok{\textless{}p\textgreater{}}\NormalTok{text of the item\textquotesingle{}s second paragraph}\KeywordTok{\textless{}/p\textgreater{}}
-    \KeywordTok{\textless{}div\textgreater{}} 
-    \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}}
-      \KeywordTok{\textless{}div\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 2)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ Text }
-\NormalTok{      of the item\textquotesingle{}s first block}\ErrorTok{\textless{}}\NormalTok{\textbackslash{}div\textgreater{}}
-      \KeywordTok{\textless{}p\textgreater{}}\NormalTok{text of the item\textquotesingle{}s second paragraph}\KeywordTok{\textless{}/p\textgreater{}}
-    \KeywordTok{\textless{}div\textgreater{}} 
+  \KeywordTok{\textless{}p} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 1)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ This is the first claim.}\KeywordTok{\textless{}/p\textgreater{}}
+  \KeywordTok{\textless{}p} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(Premise 2)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ This is the second claim.}\KeywordTok{\textless{}/p\textgreater{}}
+  \KeywordTok{\textless{}div} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}item"}\KeywordTok{\textgreater{}}
+    \KeywordTok{\textless{}p\textgreater{}\textless{}span} \ErrorTok{class}\OtherTok{=}\StringTok{"labelled{-}lists{-}label"}\KeywordTok{\textgreater{}}\NormalTok{(}\KeywordTok{\textless{}strong\textgreater{}}\NormalTok{Conclusion}\KeywordTok{\textless{}/strong\textgreater{}}\NormalTok{)}\KeywordTok{\textless{}/span\textgreater{}}\NormalTok{ This third item consists of}\KeywordTok{\textless{}/p\textgreater{}}
+    \KeywordTok{\textless{}p\textgreater{}}\NormalTok{two blocks.}\KeywordTok{\textless{}/p\textgreater{}}
+  \KeywordTok{\textless{}/div\textgreater{}}
+\KeywordTok{\textless{}/div\textgreater{}}
 \end{Highlighting}
 \end{Shaded}
 
