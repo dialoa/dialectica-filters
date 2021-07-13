@@ -102,6 +102,29 @@ Note that the label's formatting is preserved and no brackets are added.
 In the last cross-reference link here we have added brackets around
 the link to get them in the output.
 
+### Filter options
+
+Filter options can be specified in the document's metadata (YAML block)
+as follows:
+
+```markdown
+---
+title: My document
+author: John Doe
+labelled-lists:
+  set-header-includes: false
+  otheroption: value
+```
+
+That is the metadata field `labelled-lists` contains the filter options as
+a map. Presently the filter has just one option:
+
+* `set-header-includes`: if true, the filter supplements the document's 
+  meta-data with header-include code needed to style custom label lists in 
+  the output. Set to `false` or `no` if you would rather provide this code 
+  yourself in a CSS file or custom Pandoc template. (default true)
+
+
 Examples and tests
 ------------------
 
