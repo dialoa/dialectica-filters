@@ -17,7 +17,7 @@ local target_formats = {
 }
 
 -- table of indentified labels
-local label_ids = pandoc.List:new()
+local labels_by_id = {}
 
 -- html classes
 local html_classes = {
@@ -88,24 +88,22 @@ function build_list(element)
 
     for _,blocks in ipairs(element.c) do
 
-        -- get the span, remove it, extract content
+        -- get the span, remove it from the tree, store its content
         local span = blocks[1].c[1]
         blocks[1].c:remove(1)
-        local label = span.content
+        local label = pandoc.List(span.content)
         local id = ''
 
-        -- get identifier if not duplicate, store in global table
+        -- get identifier if not duplicate, store a copy in global table
         if not (span.identifier == '') then
-            if label_ids[span.identifier] then
+            if labels_by_id[span.identifier] then
                 message('WARNING', 'duplicate item identifier ' 
                     .. span.identifier .. '. The second is ignored.')
             else
-                label_ids[span.identifier] = label
+                labels_by_id[span.identifier] = label:clone()
                 id = span.identifier
             end
         end
-
-        -- if #blocks > 1 then print("found several blocks in an item") end
 
         if FORMAT:match('latex') then
 
@@ -164,13 +162,6 @@ function build_list(element)
 
     end
 
-    -- for k,v in pairs(label_ids) do
-    --     print("id " .. k .. " label " .. pandoc.utils.stringify(v) )
-    -- end
-
-
-    -- end
-
     if FORMAT:match('latex') then
         list:insert(pandoc.RawBlock('latex',
             '\\end{itemize}\n'
@@ -216,6 +207,20 @@ function filter_list (element)
 
 end
 
+--- filter_links: process internal links to labelled lists
+-- Empty links to a custom label are filled with the custom
+-- label text. 
+-- @param element pandoc AST link
+function filter_links (link)
+    if pandoc.utils.stringify(link.content) == '' 
+        and link.target:sub(1,1) == '#' 
+        and labels_by_id[link.target:sub(2,-1)] then
+            link.content = labels_by_id[link.target:sub(2,-1)]
+        return link
+    end
+end
+
+
 --- Main code
 -- return the filter on BulletList elements
 if format_matches(target_formats) then
@@ -223,5 +228,8 @@ if format_matches(target_formats) then
       {
         BulletList = filter_list
       },
+      {
+        Link = filter_links
+      }
     }
 end

@@ -3,7 +3,8 @@ title: "Labelled-lists - Custom labelled lists in Pandoc's markdown"
 author: "Julien Dutant"
 ---
 
-Labelled-lists =======
+Labelled-lists
+==============
 
 custom labelled lists in Pandoc's markdown.
 
@@ -71,6 +72,36 @@ element*.
   </span>`. See [Pandoc manual]
   (https://pandoc.org/MANUAL.html#divs-and-spans) for details. 
 
+### Cross-referencing custom-label items
+
+Custom labels can be given internal identifiers:
+
+```markdown
+* [**A1**]{#A1ref} This is the first claim.
+* [A2]{#A2ref} This is the second claim.
+* [*C*]{#Cref} This is the conclusion.
+```
+
+In Pandoc markdown internal links are created with the syntax `[link 
+text](#target_identifier)`. (Note the rounded brackets instead of
+curly ones for Span elements.) When an internal link to a custom-label
+item has no text, the filter replaces it with the label text. For
+instance, given the custom labelled list above, the following
+markdown:
+
+```markdown
+The claim [](#A1ref) together with the claim [](#A2ref) 
+entail ([](#Cref)).
+```
+
+will be converted to:
+
+> The claim [**A1**]() together with the claim [A2]() entail ([*C*]()).
+
+Note that the label's formatting is preserved and no brackets are added.
+In the last cross-reference link here we have added brackets around
+the link to get them in the output.
+
 Examples and tests
 ------------------
 
@@ -117,6 +148,15 @@ Ignored: these are not treated as labels.
   turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor.
   In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.
 
+### cross-referenced custom labels
+
+* [**A1**]{#A1ref} This is the first claim.
+* [A2]{#A2ref} This is the second claim.
+* [*C*]{#Cref} This is the conclusion.
+
+The claim [](#A1ref) together with the claim [](#A2ref) 
+entail ([](#Cref)).
+
 Details
 -------
 
@@ -126,17 +166,11 @@ Details
 \begin{itemize}
 \tightlist
 
-\item[(Premise 1)]
+\item[(Premise 1)] This is the first claim.
 
-This is the first claim.
+\item[(Premise 2)] This is the second claim.
 
-\item[(Premise 2)]
-
-This is the second claim.
-
-\item[(Conclusion)]
-
-This is the conclusion.
+\item[(Conclusion)] This is the conclusion.
 
 \end{itemize}
 ```

@@ -1,4 +1,4 @@
-<p>Labelled-lists =======</p>
+<h1 id="labelled-lists">Labelled-lists</h1>
 <p>custom labelled lists in Pandoc’s markdown.</p>
 <p>v0.1. Copyright: © 2021 Julien Dutant <a href="mailto:julien.dutant@kcl.ac.uk" class="email">julien.dutant@kcl.ac.uk</a> License: MIT - see LICENSE file for details.</p>
 <h2 id="introduction">Introduction</h2>
@@ -27,6 +27,19 @@
 <li>For the purposes of this filter, a Span is <em>non-empty</em> if its inline text is not empty. Thus <code>[]{}</code> will not work. Numbers or other unicode characters work. To generate an empty label, use a space or other invisible character, e.g. <code>[ ]   {}</code>. <em>Exception</em>: math formulas will work as labels, but if the inline text only contains LaTeX code (<code>\textsc{a}</code>) it will be treated as empty.</li>
 <li>Span elements can also be entered using HTML syntax: <code>&lt;span&gt;inline text   &lt;/span&gt;</code>. See [Pandoc manual] (https://pandoc.org/MANUAL.html#divs-and-spans) for details.</li>
 </ul>
+<h3 id="cross-referencing-custom-label-items">Cross-referencing custom-label items</h3>
+<p>Custom labels can be given internal identifiers:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">**A1**</span><span class="co">]</span>{#A1ref} This is the first claim.</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">A2</span><span class="co">]</span>{#A2ref} This is the second claim.</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">*C*</span><span class="co">]</span>{#Cref} This is the conclusion.</span></code></pre></div>
+<p>In Pandoc markdown internal links are created with the syntax <code>[link  text](#target_identifier)</code>. (Note the rounded brackets instead of curly ones for Span elements.) When an internal link to a custom-label item has no text, the filter replaces it with the label text. For instance, given the custom labelled list above, the following markdown:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>The claim [](#A1ref) together with the claim [](#A2ref) </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>entail ([](#Cref)).</span></code></pre></div>
+<p>will be converted to:</p>
+<blockquote>
+<p>The claim <a href=""><strong>A1</strong></a> together with the claim <a href="">A2</a> entail (<a href=""><em>C</em></a>).</p>
+</blockquote>
+<p>Note that the label’s formatting is preserved and no brackets are added. In the last cross-reference link here we have added brackets around the link to get them in the output.</p>
 <h2 id="examples-and-tests">Examples and tests</h2>
 <h3 id="math-formulas">math formulas</h3>
 <div class="labelled-lists-list">
@@ -61,34 +74,35 @@
 <p>Pellentesque malesuada arcu ac orci scelerisque vulputate. Aenean at ex suscipit, ultricies tellus sit amet, luctus lectus. Duis ut viverra sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor. In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.</p>
 </div>
 </div>
+<h3 id="cross-referenced-custom-labels">cross-referenced custom labels</h3>
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span id="A1ref" class="labelled-lists-label">(<strong>A1</strong>)</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span id="A2ref" class="labelled-lists-label">(A2)</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span id="Cref" class="labelled-lists-label">(<em>C</em>)</span> This is the conclusion.</p>
+</div>
+<p>The claim <a href="#A1ref"><strong>A1</strong></a> together with the claim <a href="#A2ref">A2</a> entail (<a href="#Cref"><em>C</em></a>).</p>
 <h2 id="details">Details</h2>
 <h3 id="latex-output">LaTeX output</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">itemize</span>}</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\tightlist</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 1)]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>This is the first claim.</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 2)]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>This is the second claim.</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Conclusion)]</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>This is the conclusion.</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">\end</span>{<span class="ex">itemize</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">itemize</span>}</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\tightlist</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 1)] This is the first claim.</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 2)] This is the second claim.</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Conclusion)] This is the conclusion.</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">\end</span>{<span class="ex">itemize</span>}</span></code></pre></div>
 <h3 id="html-output">HTML output</h3>
 <p>HTML output is a <code>&lt;div&gt;</code>. Each item is a <code>&lt;p&gt;</code> if it’s one block long, a <code>&lt;div&gt;</code> if longer. The label itself is contained in a <code>&lt;span&gt;</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-list&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 1)<span class="kw">&lt;/span&gt;</span> This is the first claim.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 2)<span class="kw">&lt;/span&gt;</span> This is the second claim.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(<span class="kw">&lt;strong&gt;</span>Conclusion<span class="kw">&lt;/strong&gt;</span>)<span class="kw">&lt;/span&gt;</span> This third item consists of<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;</span>two blocks.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/div&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-list&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 1)<span class="kw">&lt;/span&gt;</span> This is the first claim.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 2)<span class="kw">&lt;/span&gt;</span> This is the second claim.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(<span class="kw">&lt;strong&gt;</span>Conclusion<span class="kw">&lt;/strong&gt;</span>)<span class="kw">&lt;/span&gt;</span> This third item consists of<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;</span>two blocks.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 <h3 id="list-structures">List structures</h3>
 <ul>
 <li>In the Pandoc AST, each item is a list of blocks. If the item has only one block, the list will contain only one element.</li>

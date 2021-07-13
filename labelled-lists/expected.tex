@@ -1,4 +1,5 @@
-Labelled-lists =======
+\hypertarget{labelled-lists}{%
+\section{Labelled-lists}\label{labelled-lists}}
 
 custom labelled lists in Pandoc's markdown.
 
@@ -88,6 +89,45 @@ provided that \emph{every item starts with a non-empty Span element}.
   (https://pandoc.org/MANUAL.html\#divs-and-spans) for details.
 \end{itemize}
 
+\hypertarget{cross-referencing-custom-label-items}{%
+\subsubsection{Cross-referencing custom-label
+items}\label{cross-referencing-custom-label-items}}
+
+Custom labels can be given internal identifiers:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{**A1**}\CommentTok{]}\NormalTok{\{\#A1ref\} This is the first claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{A2}\CommentTok{]}\NormalTok{\{\#A2ref\} This is the second claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{*C*}\CommentTok{]}\NormalTok{\{\#Cref\} This is the conclusion.}
+\end{Highlighting}
+\end{Shaded}
+
+In Pandoc markdown internal links are created with the syntax
+\texttt{{[}link\ \ text{]}(\#target\_identifier)}. (Note the rounded
+brackets instead of curly ones for Span elements.) When an internal link
+to a custom-label item has no text, the filter replaces it with the
+label text. For instance, given the custom labelled list above, the
+following markdown:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{The claim [](\#A1ref) together with the claim [](\#A2ref) }
+\NormalTok{entail ([](\#Cref)).}
+\end{Highlighting}
+\end{Shaded}
+
+will be converted to:
+
+\begin{quote}
+The claim \href{}{\textbf{A1}} together with the claim \href{}{A2}
+entail (\href{}{\emph{C}}).
+\end{quote}
+
+Note that the label's formatting is preserved and no brackets are added.
+In the last cross-reference link here we have added brackets around the
+link to get them in the output.
+
 \hypertarget{examples-and-tests}{%
 \subsection{Examples and tests}\label{examples-and-tests}}
 
@@ -171,6 +211,25 @@ diam. Cras malesuada sit amet tellus id molestie.
 
 \end{itemize}
 
+\hypertarget{cross-referenced-custom-labels}{%
+\subsubsection{cross-referenced custom
+labels}\label{cross-referenced-custom-labels}}
+
+\begin{itemize}
+\tightlist
+
+\item[(\textbf{A1})] This is the first claim.
+
+\item[(A2)] This is the second claim.
+
+\item[(\emph{C})] This is the conclusion.
+
+\end{itemize}
+
+The claim \protect\hyperlink{A1ref}{\textbf{A1}} together with the claim
+\protect\hyperlink{A2ref}{A2} entail
+(\protect\hyperlink{Cref}{\emph{C}}).
+
 \hypertarget{details}{%
 \subsection{Details}\label{details}}
 
@@ -182,17 +241,11 @@ diam. Cras malesuada sit amet tellus id molestie.
 \KeywordTok{\textbackslash{}begin}\NormalTok{\{}\ExtensionTok{itemize}\NormalTok{\}}
 \FunctionTok{\textbackslash{}tightlist}
 
-\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 1)]}
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 1)] This is the first claim.}
 
-\NormalTok{This is the first claim.}
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 2)] This is the second claim.}
 
-\FunctionTok{\textbackslash{}item}\NormalTok{[(Premise 2)]}
-
-\NormalTok{This is the second claim.}
-
-\FunctionTok{\textbackslash{}item}\NormalTok{[(Conclusion)]}
-
-\NormalTok{This is the conclusion.}
+\FunctionTok{\textbackslash{}item}\NormalTok{[(Conclusion)] This is the conclusion.}
 
 \KeywordTok{\textbackslash{}end}\NormalTok{\{}\ExtensionTok{itemize}\NormalTok{\}}
 \end{Highlighting}
