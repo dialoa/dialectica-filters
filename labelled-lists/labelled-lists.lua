@@ -9,15 +9,18 @@
 
 -- # Internal settings
 
--- target_formats  filter is triggered when those format are targeted
+--- Options map, including defaults.
+-- @header boolean whether to add code in header-includes
+local options = {
+    header = true
+}
+
+-- target_formats  filter is triggered when those formats are targeted
 local target_formats = {
   "html.*",
   "latex",
   "jats",
 }
-
--- table of indentified labels
-local labels_by_id = {}
 
 -- html classes
 local html_classes = {
@@ -25,6 +28,27 @@ local html_classes = {
     label = 'labelled-lists-label',
     list = 'labelled-lists-list',
 }
+
+-- Code for header-includes.
+-- LaTeX hack https://tex.stackexchange.com/questions/1230/reference-name-of-description-list-item-in-latex
+local header_code = {
+  latex = [[
+% labelled-lists: code for crossreferencing by custom labels
+\makeatletter
+    \def\labelledlistlabel#1#2{\begingroup
+    \def\@currentlabel{#2}%
+    \label{#1}\endgroup
+    }
+\makeatother
+  ]],
+  html = [[
+  ]]
+}
+
+-- # Global variable
+
+-- table of indentified labels
+local labels_by_id = {}
 
 -- # Helper functions
 
@@ -58,9 +82,10 @@ end
 -- returns a styled label. Default: round brackets
 -- @param label Inlines an item's label as list of inlines
 function style_label(label)
-    label:insert(1, pandoc.Str('('))
-    label:insert(#label+1, pandoc.Str(')'))
-    return label
+    styled_label = label:clone()
+    styled_label:insert(1, pandoc.Str('('))
+    styled_label:insert(pandoc.Str(')'))
+    return styled_label
 end
 
 --- build_list: processes a custom label list
@@ -100,7 +125,7 @@ function build_list(element)
                 message('WARNING', 'duplicate item identifier ' 
                     .. span.identifier .. '. The second is ignored.')
             else
-                labels_by_id[span.identifier] = label:clone()
+                labels_by_id[span.identifier] = label
                 id = span.identifier
             end
         end
@@ -110,6 +135,12 @@ function build_list(element)
             local inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
             inlines:extend(style_label(label))
+            if not(id == '') then 
+                inlines:insert(pandoc.RawInline('latex',
+                    '\\labelledlistlabel{' .. id .. '}{'))
+                inlines:extend(label)
+                inlines:insert(pandoc.RawInline('latex', '}'))
+            end
             inlines:insert(pandoc.RawInline('latex',']'))
 
             -- if the first block is Plain or Para, we insert
@@ -196,40 +227,100 @@ function is_custom_labelled_list (element)
     return is_cl_list
 end
 
---- filter_list: Process custom labelled lists
--- If a list has the custom label markup, process labels
--- @param element pandoc BulletList element
-function filter_list (element)
-    
-    if is_custom_labelled_list(element) then
-        return build_list(element)
-    end
-
-end
-
 --- filter_links: process internal links to labelled lists
 -- Empty links to a custom label are filled with the custom
 -- label text. 
 -- @param element pandoc AST link
+-- @TODO in LaTeX output you need \ref and \label
 function filter_links (link)
     if pandoc.utils.stringify(link.content) == '' 
         and link.target:sub(1,1) == '#' 
         and labels_by_id[link.target:sub(2,-1)] then
+
+        -- replace link with \ref in LaTeX, fill in text otherwise
+        if FORMAT:match('latex') then
+            return pandoc.RawInline('latex', 
+                '\\ref{' .. link.target:sub(2,-1) .. '}')
+        else
             link.content = labels_by_id[link.target:sub(2,-1)]
-        return link
+            return link
+        end
     end
 end
 
+--- Write meta: add header-includes to the document's metadata.
+-- @param meta pandoc Meta block
+-- @return processed block
+local function write_meta(meta)
+
+    if options.header and header_code[FORMAT] then
+
+        local header_includes = pandoc.List:new()
+
+        -- add any exisiting meta['header-includes']
+        -- it can be MetaInlines, MetaBlocks or MetaList
+        if meta['header-includes'] then
+            if meta['header-includes'].t == 'MetaList' then
+              header_includes:extend(meta['header-includes'])
+            else
+              header_includes:insert(meta['header-includes'])
+            end
+        end
+
+        header_includes:insert(pandoc.RawBlock(FORMAT,
+            header_code[FORMAT]))
+
+        meta['header-includes'] = header_includes
+
+        return meta
+
+    end
+
+end
+
+
+--- Read options from meta block.
+--  Get options from the `statement` field in a metadata block.
+-- @todo read kinds settings
+-- @param meta the document's metadata block.
+-- @return nothing, values set in the `options` map.
+-- @see options
+local function get_options(meta)
+  if meta['labelled-lists'] then
+
+    if meta['labelled-lists'].header ~= nil then
+      if meta['labelled-lists'].header then
+        options.header = true
+      else
+        options.header = false
+      end
+    end
+
+  end
+end
+
+--- Main filters: read options, process lists, process crossreferences
+read_options_filter = {
+    Meta = get_options
+}
+process_lists_filter = {
+    BulletList = function(element)
+        if is_custom_labelled_list(element) then
+            return build_list(element)
+        end
+    end,
+        Meta = write_meta
+}
+crossreferences_filter = {
+    Link = filter_links
+}
+
 
 --- Main code
--- return the filter on BulletList elements
+-- return the filters in the desired order
 if format_matches(target_formats) then
-    return {
-      {
-        BulletList = filter_list
-      },
-      {
-        Link = filter_links
-      }
+    return { read_options_filter, 
+        process_lists_filter, 
+        crossreferences_filter
     }
 end
