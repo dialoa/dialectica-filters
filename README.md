@@ -23,7 +23,7 @@ document's bibliography when using Pandoc `citeproc` .
 * [first-line-indent](first-line-indent) Finer control of Pandoc's
 first-line indent output in HTML and LaTeX. 
 
-* [labelled-lists](labellled-lists) Custom labelled lists in LaTeX and HTML ouptut.
+* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML ouptut.
 
 * [longtable-to-xtab](longtable-to-xtab) Convert LaTeX
 `longtable` environments into `xtab` environments in Pandoc's LaTeX
