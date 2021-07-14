@@ -74,7 +74,9 @@ element*.
 
 ### Cross-referencing custom-label items
 
-Custom labels can be given internal identifiers:
+Custom labels can be given internal identifiers. The syntax is 
+`[label]{#identifier}`. In the list below, `A1ref`, `A2ref` and
+`Cref` identify the item:
 
 ```markdown
 * [**A1**]{#A1ref} This is the first claim.
@@ -82,27 +84,71 @@ Custom labels can be given internal identifiers:
 * [*C*]{#Cref} This is the conclusion.
 ```
 
+Note that `#` is not part of the identifier. Identifiers should start 
+with a letter and contain only letters, digits, colons `:`, dots `.`,
+dashes `-` and underscores `_`. 
+
+Labels with identifiers can be crossreferenced using 
+Pandoc's citations or internal links.
+
+#### Cross-referencing with citations
+
+The basic syntax is:
+
+* Reference in text: `@A1ref`. Outputs the label with its formatting: **A1**.
+* Normal reference: `[@A1ref]`. Outputs the label with its formatting, 
+  in parentheses: (**A1**). A prefix and suffix can be specified too:
+  `[remember @A1ref and the like]` will output (remember **A1** and the like).
+* The suppressed author style, `[-@A1ref]`, will be processed 
+  as normal reference
+
+You can crossrefer to several custom labels at a time: 
+`[@A1ref; @A2ref]`. But mixing references to a custom label
+with bibliographic ones in a same citation won't work: if
+`Smith2003` is a key in your bibliography `[@A1ref; Smith2003]`
+will only output "(@A1ref; Smith, 2003)".
+
+Because this syntax overlaps with Pandoc's citation syntax, conflicts
+should be avoided:
+
+* Avoid giving the same identifier (e.g. `Smith2005`) to 
+  a custom label item and a bibliographic entry. If that happens,
+  the citation will be interpreted as crossreference to the custom
+  label item. To make sure you you may use identifiers starting 
+  with `item:`: `item:A1ref`, `item:A2ref`, or some other prefix.
+* The filter should preferably be run before `citeproc`, and 
+  before other filters that use citations (like `pandoc-crossref`). 
+  It may work properly even if it is run after, though `citeproc` 
+  will issue "citations not found" warnings. To ensure that
+  the filter is run before, just place it before in the 
+  command line or in your YAML options file's `filters` field.
+
+Alternatively, the citation syntax for crossreferencing 
+custom label items can be deactivated. 
+See [Customization] below. 
+
+#### Cross-referencing with internal links
+
 In Pandoc markdown internal links are created with the syntax `[link 
 text](#target_identifier)`. (Note the rounded brackets instead of
-curly ones for Span elements.) When an internal link to a custom-label
-item has no text, the filter replaces it with the label text. For
-instance, given the custom labelled list above, the following
-markdown:
+curly ones for Span element identifiers.) You can use internal
+links to cross-refer to custom label items that have a identifier.
+If your link has no text, the label with its formatting will be
+printed out; otherwise whichever text you give for the link. 
+For instance, given the custom label list above, the following:
 
 ```markdown
-The claim [](#A1ref) together with the claim [](#A2ref) 
+The claim [](#A1ref) together with [the next claim](#A2ref) 
 entail ([](#Cref)).
 ```
 
-will be converted to:
+will output:
 
-> The claim [**A1**]() together with the claim [A2]() entail ([*C*]()).
+> The claim [**A1**]() together with [the next claim]() entail ([*C*]()).
 
-Note that the label's formatting is preserved and no brackets are added.
-In the last cross-reference link here we have added brackets around
-the link to get them in the output.
+where the links point to the corresponding items in the list. 
 
-### Filter options
+### Customization
 
 Filter options can be specified in the document's metadata (YAML block)
 as follows:
@@ -113,7 +159,7 @@ title: My document
 author: John Doe
 labelled-lists:
   set-header-includes: false
-  otheroption: value
+  citation-syntax: false
 ```
 
 That is the metadata field `labelled-lists` contains the filter options as
@@ -123,6 +169,8 @@ a map. Presently the filter has just one option:
   meta-data with header-include code needed to style custom label lists in 
   the output. Set to `false` or `no` if you would rather provide this code 
   yourself in a CSS file or custom Pandoc template. (default true)
+* `citation-syntax`: if true, the filter will process cross-references
+  made with the citation syntax. (default: true)
 
 
 Examples and tests
@@ -171,7 +219,16 @@ Ignored: these are not treated as labels.
   turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor.
   In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.
 
-### cross-referenced custom labels
+### cross-reference with citation syntax 
+
+* [**B1**]{#B1ref} This is the first claim.
+* [B2]{#B2ref} This is the second claim.
+* [*D*]{#Dref} This is the conclusion.
+
+The claim @B1ref together with the claim @B2ref 
+entail [@Dref].
+
+### cross-reference with internal link syntax
 
 * [**A1**]{#A1ref} This is the first claim.
 * [A2]{#A2ref} This is the second claim.

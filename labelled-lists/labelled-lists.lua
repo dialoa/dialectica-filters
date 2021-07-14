@@ -10,9 +10,11 @@
 -- # Internal settings
 
 --- Options map, including defaults.
--- @header boolean whether to add code in header-includes
+-- @set_header_includes boolean whether to add code in header-includes
+-- @citation_syntax boolean whether to use pandoc-crossref cite syntax
 local options = {
-    header = true
+    set_header_includes = true,
+    citation_syntax = true
 }
 
 -- target_formats  filter is triggered when those formats are targeted
@@ -77,6 +79,101 @@ function message(type, text)
 end
 
 -- # Filter functions
+
+--- filter_citations: process citations to labelled lists
+-- Check whether the Cite element only contains references to custom 
+-- label items, and if it does, convert them to crossreferences.
+-- @param cite pandoc AST Cite element
+function filter_citations(cite)
+
+    -- warn if the citations mix cross-label references with 
+    -- standard ones
+    local has_cl_ref = false
+    local has_biblio_ref = false
+
+    for _,citation in ipairs(cite.citations) do
+        if labels_by_id[citation.id] then
+            has_cl_ref = true
+        else
+            has_biblio_ref = true
+        end
+    end
+
+    if has_cl_ref and has_biblio_ref then
+        message('WARNING', 'A citation mixes bibliographic references \
+            with custom label references '
+            .. pandoc.utils.stringify(cite.content) )
+        return
+    end
+
+    if has_cl_ref and not has_biblio_ref then
+
+        -- get style from the first citation
+        local bracketed = true 
+        if cite.citations[1].mode == 'AuthorInText' then
+            bracketed = false
+        end
+
+        local inlines = pandoc.List:new()
+
+        -- replace citation with \ref in LaTeX, create Link otherwise
+        if FORMAT:match('latex') then
+
+            for i = 1, #cite.citations do
+               inlines:insert(pandoc.RawInline('latex', 
+                '\\ref{' .. cite.citations[i].id .. '}'))
+                -- add separator if needed
+                if #cite.citations > 1 and i < #cite.citations then
+                    inlines:insert(pandoc.RawInline('latex', '; '))
+                end
+            end
+
+        else 
+
+            for i = 1, #cite.citations do
+               inlines:insert(pandoc.Link(
+                    labels_by_id[cite.citations[i].id],
+                    '#' .. cite.citations[i].id
+                ))
+                -- add separator if needed
+                if #cite.citations > 1 and i < #cite.citations then
+                    inlines:insert(pandoc.Str('; '))
+                end
+            end
+
+        end
+
+        if bracketed then
+            inlines:insert(1, pandoc.Str('('))
+            inlines:insert(pandoc.Str(')'))
+        end
+
+        return inlines
+
+    end
+
+end
+
+--- filter_links: process internal links to labelled lists
+-- Empty links to a custom label are filled with the custom
+-- label text. 
+-- @param element pandoc AST link
+-- @TODO in LaTeX output you need \ref and \label
+function filter_links (link)
+    if pandoc.utils.stringify(link.content) == '' 
+        and link.target:sub(1,1) == '#' 
+        and labels_by_id[link.target:sub(2,-1)] then
+
+        -- replace link with \ref in LaTeX, fill in text otherwise
+        if FORMAT:match('latex') then
+            return pandoc.RawInline('latex', 
+                '\\ref{' .. link.target:sub(2,-1) .. '}')
+        else
+            link.content = labels_by_id[link.target:sub(2,-1)]
+            return link
+        end
+    end
+end
 
 -- style_label: style the label
 -- returns a styled label. Default: round brackets
@@ -227,33 +324,12 @@ function is_custom_labelled_list (element)
     return is_cl_list
 end
 
---- filter_links: process internal links to labelled lists
--- Empty links to a custom label are filled with the custom
--- label text. 
--- @param element pandoc AST link
--- @TODO in LaTeX output you need \ref and \label
-function filter_links (link)
-    if pandoc.utils.stringify(link.content) == '' 
-        and link.target:sub(1,1) == '#' 
-        and labels_by_id[link.target:sub(2,-1)] then
-
-        -- replace link with \ref in LaTeX, fill in text otherwise
-        if FORMAT:match('latex') then
-            return pandoc.RawInline('latex', 
-                '\\ref{' .. link.target:sub(2,-1) .. '}')
-        else
-            link.content = labels_by_id[link.target:sub(2,-1)]
-            return link
-        end
-    end
-end
-
 --- Write meta: add header-includes to the document's metadata.
 -- @param meta pandoc Meta block
 -- @return processed block
 local function write_meta(meta)
 
-    if options.header and header_code[FORMAT] then
+    if options.set_header_includes and header_code[FORMAT] then
 
         local header_includes = pandoc.List:new()
 
@@ -288,11 +364,12 @@ end
 local function get_options(meta)
   if meta['labelled-lists'] then
 
-    if meta['labelled-lists'].header ~= nil then
-      if meta['labelled-lists'].header then
-        options.header = true
+    -- set-header-includes: boolean
+    if meta['labelled-lists']['set-header-includes'] ~= nil then
+      if meta['labelled-lists']['set-header-includes'] then
+        options.set_header_includes = true
       else
-        options.header = false
+        options.set_header_includes = false
       end
     end
 
@@ -312,7 +389,12 @@ process_lists_filter = {
         Meta = write_meta
 }
 crossreferences_filter = {
-    Link = filter_links
+    Link = filter_links,
+    Cite = function(element) 
+        if options.citation_syntax then 
+            return filter_citations(element)
+        end
+    end
 }
 
 

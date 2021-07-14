@@ -2,6 +2,12 @@
 -- by Chen Tao (https://github.com/jagt), public domain
 -- https://github.com/jagt/pprint.lua/
 
+-- NB how to load and use from other filters:
+-- package.path = '../functions/pprint.lua'
+-- local pprint = require('pprint.lua')
+--
+-- pprint(object)
+
 local pprint = { VERSION = '0.1' }
 
 local depth = 1

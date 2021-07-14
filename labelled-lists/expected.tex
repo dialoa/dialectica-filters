@@ -197,7 +197,9 @@ provided that \emph{every item starts with a non-empty Span element}.
 \subsubsection{Cross-referencing custom-label
 items}\label{cross-referencing-custom-label-items}}
 
-Custom labels can be given internal identifiers:
+Custom labels can be given internal identifiers. The syntax is
+\texttt{{[}label{]}\{\#identifier\}}. In the list below, \texttt{A1ref},
+\texttt{A2ref} and \texttt{Cref} identify the item:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -207,30 +209,126 @@ Custom labels can be given internal identifiers:
 \end{Highlighting}
 \end{Shaded}
 
+Note that \texttt{\#} is not part of the identifier. Identifiers should
+start with a letter and contain only letters, digits, colons \texttt{:},
+dots \texttt{.}, dashes \texttt{-} and underscores \texttt{\_}.
+
+Labels with identifiers can be crossreferenced using Pandoc's citations
+or internal links.
+
+\hypertarget{cross-referencing-with-citations}{%
+\paragraph{Cross-referencing with
+citations}\label{cross-referencing-with-citations}}
+
+The basic syntax is:
+
+\begin{itemize}
+\tightlist
+\item
+  Reference in text: \texttt{@A1ref}. Outputs the label with its
+  formatting: \textbf{A1}.
+\item
+  Normal reference: \texttt{{[}@A1ref{]}}. Outputs the label with its
+  formatting, in parentheses: (\textbf{A1}). A prefix and suffix can be
+  specified too: \texttt{{[}remember\ @A1ref\ and\ the\ like{]}} will
+  output (remember \textbf{A1} and the like).
+\item
+  The suppressed author style, \texttt{{[}-@A1ref{]}}, will be processed
+  as normal reference
+\end{itemize}
+
+You can crossrefer to several custom labels at a time:
+\texttt{{[}@A1ref;\ @A2ref{]}}. But mixing references to a custom label
+with bibliographic ones in a same citation won't work: if
+\texttt{Smith2003} is a key in your bibliography
+\texttt{{[}@A1ref;\ Smith2003{]}} will only output ``(\ref{A1ref};
+Smith, 2003)''.
+
+Because this syntax overlaps with Pandoc's citation syntax, conflicts
+should be avoided:
+
+\begin{itemize}
+\tightlist
+\item
+  Avoid giving the same identifier (e.g.~\texttt{Smith2005}) to a custom
+  label item and a bibliographic entry. If that happens, the citation
+  will be interpreted as crossreference to the custom label item. To
+  make sure you you may use identifiers starting with \texttt{item:}:
+  \texttt{item:A1ref}, \texttt{item:A2ref}, or some other prefix.
+\item
+  The filter should preferably be run before \texttt{citeproc}, and
+  before other filters that use citations (like
+  \texttt{pandoc-crossref}). It may work properly even if it is run
+  after, though \texttt{citeproc} will issue ``citations not found''
+  warnings. To ensure that the filter is run before, just place it
+  before in the command line or in your YAML options file's
+  \texttt{filters} field.
+\end{itemize}
+
+Alternatively, the citation syntax for crossreferencing custom label
+items can be deactivated. See
+\protect\hyperlink{customization}{Customization} below.
+
+\hypertarget{cross-referencing-with-internal-links}{%
+\paragraph{Cross-referencing with internal
+links}\label{cross-referencing-with-internal-links}}
+
 In Pandoc markdown internal links are created with the syntax
 \texttt{{[}link\ \ text{]}(\#target\_identifier)}. (Note the rounded
-brackets instead of curly ones for Span elements.) When an internal link
-to a custom-label item has no text, the filter replaces it with the
-label text. For instance, given the custom labelled list above, the
-following markdown:
+brackets instead of curly ones for Span element identifiers.) You can
+use internal links to cross-refer to custom label items that have a
+identifier. If your link has no text, the label with its formatting will
+be printed out; otherwise whichever text you give for the link. For
+instance, given the custom label list above, the following:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{The claim [](\#A1ref) together with the claim [](\#A2ref) }
+\NormalTok{The claim [](\#A1ref) together with }\CommentTok{[}\OtherTok{the next claim}\CommentTok{](\#A2ref)} 
 \NormalTok{entail ([](\#Cref)).}
 \end{Highlighting}
 \end{Shaded}
 
-will be converted to:
+will output:
 
 \begin{quote}
-The claim \href{}{\textbf{A1}} together with the claim \href{}{A2}
+The claim \href{}{\textbf{A1}} together with \href{}{the next claim}
 entail (\href{}{\emph{C}}).
 \end{quote}
 
-Note that the label's formatting is preserved and no brackets are added.
-In the last cross-reference link here we have added brackets around the
-link to get them in the output.
+where the links point to the corresponding items in the list.
+
+\hypertarget{customization}{%
+\subsubsection{Customization}\label{customization}}
+
+Filter options can be specified in the document's metadata (YAML block)
+as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-}{-}}
+\AnnotationTok{title:}\CommentTok{ My document}
+\AnnotationTok{author:}\CommentTok{ John Doe}
+\AnnotationTok{labelled{-}lists:}
+\CommentTok{  set{-}header{-}includes: false}
+\CommentTok{  citation{-}syntax: false}
+\end{Highlighting}
+\end{Shaded}
+
+That is the metadata field \texttt{labelled-lists} contains the filter
+options as a map. Presently the filter has just one option:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{set-header-includes}: if true, the filter supplements the
+  document's meta-data with header-include code needed to style custom
+  label lists in the output. Set to \texttt{false} or \texttt{no} if you
+  would rather provide this code yourself in a CSS file or custom Pandoc
+  template. (default true)
+\item
+  \texttt{citation-syntax}: if true, the filter will process
+  cross-references made with the citation syntax. (default: true)
+\end{itemize}
 
 \hypertarget{examples-and-tests}{%
 \subsection{Examples and tests}\label{examples-and-tests}}
@@ -315,9 +413,29 @@ diam. Cras malesuada sit amet tellus id molestie.
 
 \end{itemize}
 
-\hypertarget{cross-referenced-custom-labels}{%
-\subsubsection{cross-referenced custom
-labels}\label{cross-referenced-custom-labels}}
+\hypertarget{cross-reference-with-citation-syntax}{%
+\subsubsection{cross-reference with citation
+syntax}\label{cross-reference-with-citation-syntax}}
+
+\begin{itemize}
+\tightlist
+
+\item[(\textbf{B1})\labelledlistlabel{B1ref}{\textbf{B1}}] This is the
+first claim.
+
+\item[(B2)\labelledlistlabel{B2ref}{B2}] This is the second claim.
+
+\item[(\emph{D})\labelledlistlabel{Dref}{\emph{D}}] This is the
+conclusion.
+
+\end{itemize}
+
+The claim \ref{B1ref} together with the claim \ref{B2ref} entail
+(\ref{Dref}).
+
+\hypertarget{cross-reference-with-internal-link-syntax}{%
+\subsubsection{cross-reference with internal link
+syntax}\label{cross-reference-with-internal-link-syntax}}
 
 \begin{itemize}
 \tightlist
