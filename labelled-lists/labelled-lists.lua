@@ -355,7 +355,7 @@ local function write_meta(meta)
 end
 
 
---- Read options from meta block.
+--- Read options from metadata block.
 --  Get options from the `statement` field in a metadata block.
 -- @todo read kinds settings
 -- @param meta the document's metadata block.
@@ -375,6 +375,8 @@ local function get_options(meta)
 
   end
 end
+
+-- # Filter
 
 --- Main filters: read options, process lists, process crossreferences
 read_options_filter = {
