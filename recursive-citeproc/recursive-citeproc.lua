@@ -25,8 +25,17 @@ depth = 0
 
 --- get_options: get filter options for document's metadata
 -- @param meta pandoc Meta element
+-- @TODO set depth 
 function get_options(meta)
-    -- no option to provide atm
+    if meta['recursive_citeproc'] then
+
+        if meta['recursive_citeproc']['max-depth'] then
+            options.max_depth = 
+                tonumber(meta['recursive_citeproc']['max-depth'])
+                or options.max_depth
+        end
+        
+    end
 end
 
 --- parse_nocite(nocite)
@@ -132,9 +141,10 @@ function recursive_citeproc(document)
         return new_doc
     else
     -- otherwise add missing citations to meta, process again
+    -- provided we haven't reached the max depth (0 = infinite)
 
         depth = depth + 1
-        if depth < options.max_depth then
+        if options.max_depth == 0 or depth < options.max_depth then
 
             -- insert missing citations ids in nocite_cites
             for _,citation in ipairs(new_all_cites) do
@@ -147,9 +157,13 @@ function recursive_citeproc(document)
             document.meta.nocite = create_nocite_field(nocite_cites)
 
             -- process again
-            -- return new_doc
             return recursive_citeproc(document)
             
+        else
+        -- if we've reached the max depth, return the latest result
+
+            return new_doc
+
         end
 
     end
