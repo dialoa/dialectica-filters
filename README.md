@@ -32,6 +32,8 @@ output (to be used within columns with the columns filter).
 * [not-in-format](not-in-format) Keep part of a document out of selected
 output formats. Included in [pandoc/lua-filters](https://github.com/pandoc/lua-filters).
 
+* [recursive-citeproc](recursive-citeproc) Handle self-citing bibliographies.
+
 And:
 
 * [functions](functions) some functions to be reused across filters.
