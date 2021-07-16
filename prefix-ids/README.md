@@ -55,3 +55,12 @@ Warning
 
 The filter doesn't handle identifiers and links situated in the 
 document's metadata, e.g. in the `abstract` or `thanks` field.
+
+Note
+----
+
+Pandoc's [`id_prefix` option](https://pandoc.org/MANUAL.html#option--id-prefix)
+does something similar but only for HTML and DocBook output. 
+This filter applies the prefix within the Pandoc AST
+document, making it suitable for inclusion within wider
+pandoc documents, directly or via json output.

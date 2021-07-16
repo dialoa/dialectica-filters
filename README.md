@@ -34,6 +34,9 @@ output formats. Included in [pandoc/lua-filters](https://github.com/pandoc/lua-f
 
 * [recursive-citeproc](recursive-citeproc) Handle self-citing bibliographies.
 
+* [prefix-ids](prefix-ids) Adds a prefix to all `identifiers` within a 
+   Pandoc document.
+
 And:
 
 * [functions](functions) some functions to be reused across filters.
