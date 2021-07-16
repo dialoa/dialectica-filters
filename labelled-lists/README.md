@@ -1,4 +1,3 @@
-
 ---
 title: "Labelled-lists - Custom labelled lists in Pandoc's markdown"
 author: "Julien Dutant"
