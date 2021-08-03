@@ -26,8 +26,9 @@ function to_json(doc)
 	local command = ''
 	local arguments = pandoc.List:new()
 	--	strings to build an empty document with a RawBlock element
-	local before = [[{"pandoc-api-version":[1,22],"meta":{},"blocks":]]
-						.. [[[{"t":"RawBlock","c":["json","]]
+	local api_ver_str = tostring(PANDOC_API_VERSION):gsub('%.',',')
+	local before = '{"pandoc-api-version":[' .. api_ver_str .. '],'
+		.. [["meta":{},"blocks":[{"t":"RawBlock","c":["json","]]
 	local after =	[["]}]}]]
 	local result = nil
 	if pandoc.system.os == 'mingw32' then
