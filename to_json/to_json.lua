@@ -11,19 +11,19 @@ within Lua filters
 -- @param doc pandoc Pandoc object
 function to_json(doc)
 
-	-- build the perl script
-	local script = ''
+	-- build the sed command
+	local command = ''
 	-- escape backlashes and double quotes
-  script = script .. [[ s/\\/\\\\/g; ]] .. [[ s/\"/\\"/g; ]]
+  command = command .. [[s/\\/\\\\/g; ]] .. [[s/\"/\\"/g; ]]
 	-- wrap the result in an empty element with a RawBlock element
 	local before = '{"pandoc-api-version":[1,22],"meta":{},"blocks":'
 									.. '[{"t":"RawBlock","c":["json","'
 	local after =	'"]}]}'
-	script = script .. [[ s/^/ ]] .. before .. [[ /; ]] 
-		.. [[ s/$/ ]] .. after  .. [[ / ]]
+	command = command .. [[s/^/]] .. before .. [[/; ]] 
+		.. [[s/$/]] .. after .. [[/; ]]
 
 	-- run the filter, catch the result in the `text` field of the first block
-	local result = pandoc.utils.run_json_filter(doc, 'perl', {'-pe', script})
+	local result = pandoc.utils.run_json_filter(doc, 'sed', {command})
 
 	-- return the string or nil
 	return result.blocks[1].c[2] or nil
@@ -36,6 +36,7 @@ return {{
 
 	Pandoc = function(doc)
 		print(to_json(doc))
+		return pandoc.Pandoc({},{})
 	end,
 
 	-- in the future, we'd like to_json to cover arbitrary pandoc AST objects
