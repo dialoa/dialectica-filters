@@ -6,11 +6,9 @@ author: "Julien Dutant"
 To_json: Pandoc to JSON string conversion within Lua filters
 =======
 
-Pandoc Lua filters](https://pandoc.org/lua-filters.html) function to covert 
-a Pandoc object to a native JSON representation string.
+Function to be used in [Pandoc Lua filters](https://pandoc.org/lua-filters.html) to convert a Pandoc AST document object to its native JSON representation string. 
 
-*Requirements*. Perl. Installed by default on most systems; you can check that
-it is by running `perl -v` on the command line.
+**Note for Windows users**. On Windows, the function uses Powershell to do string replacement. Two calls are needed, and Powershell takes a few seconds to load, so the function is slow. In the future I'd like to make it use python if available. *More importantly*, the function will put the current terminal window in Unicode (UTF8) mode (which may change the terminal's display font too). This might interfere with other commands you're running from the same terminal window (though not with Pandoc, which works better in utf8 mode). There is no way to revert the current terminal window to its default state: the only option is to close it and open a new one. If you need to run other tasks in your terminal default font encodings, just do so in separate terminal windows. 
 
 Description
 ------------
@@ -59,14 +57,20 @@ pandoc -L to_json sample.file
 Prints out the native JSON representation of `sample.file`. It should give you
 the same output as `pandoc -to json sample.file`. 
 
-Note
-----
-
-`perlsandbox.pl` is not needed to run the filter. We use it to test
-the filter's perl commands that wrap a string within a native JSON representation. Run `perlsandbox.pl | pandoc -f json -t markdown` to see if Pandoc can read the string produced. 
-
 Developments
 ------------
 
-* The function should handle not only elements of the Pandoc type, but other
-  elements types (incl Meta, MetaList etc., but not components).
+# Use more efficient scripting engines in Windows
+
+Use Python and perhaps Perl if available rather than the Windows Powershell.
+
+# Handle all Pandoc AST elements
+
+The function should handle not only elements of the Pandoc type, but other
+  elements types (incl Meta, MetaList etc., but not components). Since `run_json_filter` only converts entire Pandoc documents, to do this the function should:
+
+* Recognize if the element is a Meta or body type
+* Create a Pandoc AST document, place the element in `meta` or `blocks` as appropriate
+* Get the JSON string for that Pandoc AST document
+* Extract the relevant part of the resulting JSON string (in a sufficiently safe way to avoid cutting off the coverted code)
+
