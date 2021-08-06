@@ -25,7 +25,15 @@ all elements with an identifier within a document's body
 
 It is best used after filters that add or modify links. 
 
-*Note*. 
+*Note*. Pandoc's [`id_prefix` option](https://pandoc.org/MANUAL.html#option--id-prefix)
+does something similar but only for HTML and DocBook output. 
+This filter applies the prefix within the Pandoc AST
+document, making it suitable for inclusion within wider
+pandoc documents, directly or via json output.
+
+On the other hand, Pandoc's [`id_prefix` option](https://pandoc.org/MANUAL.html#option--id-prefix) covers footnote links in HTML
+outputs, and this function can't control them. So this function
+is best used for non-HTML only.
 
 Usage
 -----
@@ -55,12 +63,3 @@ Warning
 
 The filter doesn't handle identifiers and links situated in the 
 document's metadata, e.g. in the `abstract` or `thanks` field.
-
-Note
-----
-
-Pandoc's [`id_prefix` option](https://pandoc.org/MANUAL.html#option--id-prefix)
-does something similar but only for HTML and DocBook output. 
-This filter applies the prefix within the Pandoc AST
-document, making it suitable for inclusion within wider
-pandoc documents, directly or via json output.
