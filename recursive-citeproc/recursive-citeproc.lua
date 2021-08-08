@@ -10,8 +10,8 @@
 -- # Internal settings
 
 -- NB how to load and use from other filters:
-package.path = '../tools/pprint.lua'
-local pprint = require('pprint.lua')
+--package.path = '../tools/pprint.lua'
+--local pprint = require('pprint.lua')
 
 --- Options map, including defaults.
 local options = {
@@ -128,11 +128,26 @@ function recursive_citeproc(document)
 
     -- while citations_added do
 
+    -- build arguments for running pandoc with citeproc
+    local arguments = pandoc.List:new()
+    arguments:extend({'--from=json', '--to=json', '--citeproc'})
+    --   add resource path if needed
+    local paths = pandoc.List:new(PANDOC_STATE.resource_path)
+    if #paths > 1 or #path[1] ~= '.' then
+        local path_str = ''
+        for i = 1, #paths do
+            path_str = path_str .. paths[i]
+            if i < #paths then
+                path_str = path_str .. ':'
+            end
+        end
+        if path_str ~= '' then
+            arguments:extend({'--resource-path', path_str})
+        end
+    end
+
     local new_doc = pandoc.utils.run_json_filter(document,
-        'pandoc',
-        {'--from=json', '--to=json', '--citeproc'})
-    -- copy the current meta in case previous filters have changed it
-    new_doc.meta = document.meta:clone()
+        'pandoc', arguments)
 
     -- check whether citations have been added (or nocite contains @*)
     local new_all_cites, nocite_cites = collect_citations_ids(new_doc)
