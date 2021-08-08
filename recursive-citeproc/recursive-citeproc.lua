@@ -133,7 +133,7 @@ function recursive_citeproc(document)
     arguments:extend({'--from=json', '--to=json', '--citeproc'})
     --   add resource path if needed
     local paths = pandoc.List:new(PANDOC_STATE.resource_path)
-    if #paths > 1 or #path[1] ~= '.' then
+    if #paths > 1 or #paths[1] ~= '.' then
         local path_str = ''
         for i = 1, #paths do
             path_str = path_str .. paths[i]
