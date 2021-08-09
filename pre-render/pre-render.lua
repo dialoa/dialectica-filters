@@ -11,7 +11,7 @@ with class "pre-render" will be pre-rendered as svg images.
 @release 0.1
 @see inspired by John MacFarlane's filter "Building images with TiKZ"
   in pandoc's documentation <https://pandoc.org/lua-filters.html#examples>
-@see Oltolm's `pandoc-latex-math` filter 
+@see Oltolm's similar `pandoc-latex-math` filter 
   <https://github.com/oltolm/pandoc-latex-math/>
 ]]
 
