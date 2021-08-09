@@ -1,5 +1,4 @@
-# Pre-render - Lua filter for Pandoc to convert pre-selected maths
-  elements as vector images
+# Pre-render - Lua filter for Pandoc to convert pre-selected maths elements as vector images
 
 The pre-render Lua filter for [Pandoc](https://pandoc.org) converts
 pre-selected (optionally: all) math elements as scalable vector
