@@ -4,7 +4,8 @@ pre-render:
     exclude-formats: [latex,markdown] # don't convert in markdown
     header-includes: | 
         \usepackage{amssymb}
-    use-header: true # false will ignore the main header-includes 
+        \usepackage{mathptmx}
+    use-header: false # false will ignore the main header-includes 
 author: Julien Dutant
 title: Pre-render filter sample document
 header-includes: 

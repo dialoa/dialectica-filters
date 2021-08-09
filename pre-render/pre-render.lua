@@ -26,6 +26,7 @@ with class "pre-render" will be pre-rendered as svg images.
 -- @TODO improve code following diagram-generator style
 -- @TODO for Math return Spans with `math display` or `math inline` classes,
 --    like Pandoc
+-- @TODO fix font sizes (1.21 times bigger, says Katex?)
 
 -- # Global variables
 
@@ -38,14 +39,14 @@ local path = require('pandoc.path')
 --  for display math we use \displaystyle 
 --  see <https://tex.stackexchange.com/questions/50162/how-to-make-a-standalone-document-with-one-equation>
 local inlinemath_template = [[
-  \documentclass[12pt]{standalone}
+  \documentclass{standalone}
   %s
   \begin{document}
   $%s$
   \end{document}
 ]]
 local displaymath_template = [[
-  \documentclass[12pt]{standalone}
+  \documentclass{standalone}
   %s
   \begin{document}
   $\displaystyle
