@@ -1,9 +1,9 @@
 --[[-- # Pre-render - Pandoc Lua filter for pre-rendering
-  selected math elements as svg images.
+  selected math elements as svg or png images.
 
 Pre-renders specified maths elements as images. When the target
 format isn't LaTeX, any math contained in with a Div or Span
-with class "pre-render" will be pre-rendered as svg images.
+with class "pre-render" will be pre-rendered as svg or png images.
 
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
@@ -76,7 +76,7 @@ local options = {
 }
 local acceptable_scopes = pandoc.List:new(
   {'all', 'math', 'raw', 'none', 'selected'})
-  
+
 if FORMAT == 'docx' or FORMAT == 'pptx' or FORMAT == 'rtf' then
     options.filetype = 'png'
     options.inkscape = true -- PNG is so far only supported by Inkscape
@@ -167,6 +167,9 @@ end
 -- unless we already have an image for that element's code
 -- @param elem math element to be pre-rendered
 local function pre_render(elem)
+
+    -- print(FORMAT)
+    -- print(options.exclude_formats)
 
   -- if Raw, only process `latex` or `tex`
   if (elem.t == 'RawInline' or elem.t == 'RawBlock')
@@ -302,16 +305,24 @@ function get_options(meta)
         options.exclude_formats:insert(pandoc.utils.stringify(item))
       end
       -- do nothing if the present output format is excluded
-      for _,format in ipairs(options.exclude_formats) do
-        if FORMAT:match(format) then
-          options.do_something = false
-          break
-        end
-      end
+      -- for _, format in ipairs(options.exclude_formats) do
+      --   if FORMAT:match(format) then
+      --     options.do_something = false
+      --     break
+      --   end
+      -- end
     end
     -- `header-includes`: gather LaTeX
     if opt_map['header-includes'] then
       collect_header_includes(opt_map['header-includes'])
+    end
+  end
+
+  -- ignore if the format is in the exclude_formats options
+  for _, format in ipairs(options.exclude_formats) do
+    if FORMAT:match(format) then
+        options.do_something = false
+        break
     end
   end
 
