@@ -11,7 +11,7 @@ with class "pre-render" will be pre-rendered as svg images.
 @release 0.1
 @see inspired by John MacFarlane's filter "Building images with TiKZ"
   in pandoc's documentation <https://pandoc.org/lua-filters.html#examples>
-@see Oltolm's similar `pandoc-latex-math` filter 
+@see Oltolm's similar `pandoc-latex-math` filter
   <https://github.com/oltolm/pandoc-latex-math/>
 ]]
 
@@ -36,7 +36,7 @@ local path = require('pandoc.path')
 -- local mediabag = require 'pandoc.mediabag' -- to be added later
 
 -- LaTeX document templates
---  for display math we use \displaystyle 
+--  for display math we use \displaystyle
 --  see <https://tex.stackexchange.com/questions/50162/how-to-make-a-standalone-document-with-one-equation>
 local inlinemath_template = [[
   \documentclass{standalone}
@@ -70,7 +70,8 @@ local options = {
   scope = 'selected', -- `selected`, `all`, `math`, `raw`, `none`
   exclude_formats = {'latex'}, -- default format to exclude
   do_something = true, -- false to deactivate the filter
-  header = '' -- store for header-includes LaTeX code
+  header = '', -- store for header-includes LaTeX code
+  inkscape = false -- use inkscape instead of pdf2svg
 }
 local acceptable_scopes = pandoc.List:new(
   {'all', 'math', 'raw', 'none', 'selected'})
@@ -84,7 +85,7 @@ function message(type, text)
     local level = {INFO = 0, WARNING = 1, ERROR = 2}
     if level[type] == nil then type = 'ERROR' end
     if level[PANDOC_STATE.verbosity] <= level[type] then
-        io.stderr:write('[' .. type .. '] Pre-render lua filter: ' 
+        io.stderr:write('[' .. type .. '] Pre-render lua filter: '
             .. text .. '\n')
     end
 end
@@ -119,9 +120,22 @@ local function math2image(source, filepath)
         '--output-format=pdf',
         'math.tex'
       }, '')
-      pandoc.pipe('pdf2svg', {'math.pdf', filepath}, '')
+      if options.inkscape then
+        pandoc.pipe('inkscape',
+            {
+                'math.pdf',
+                '--export-type=svg',
+                '--export-plain-svg',
+                '--pdf-poppler',
+                '--export-filename=' .. filepath
+            },
+        '')
+      else
+        pandoc.pipe('pdf2svg', {'math.pdf', filepath}, '')
+      end
+
       -- os.execute('lualatex --interaction=nonstopmode '
-      --   .. '--output-format=' .. format .. ' ' 
+      --   .. '--output-format=' .. format .. ' '
       --   .. 'math.tex')
       -- os.execute('pdf2svg math.pdf ' .. filepath)
       -- os.execute('dvisvgm --optimize math.dvi ')
@@ -136,17 +150,17 @@ end
 local function pre_render(elem)
 
   -- if Raw, only process `latex` or `tex`
-  if (elem.t == 'RawInline' or elem.t == 'RawBlock') 
+  if (elem.t == 'RawInline' or elem.t == 'RawBlock')
     and not (elem.format == 'tex' or elem.format == 'latex') then
       return nil
   end
 
-  local filepath = path.join( { 
-    system.get_working_directory(), 
+  local filepath = path.join( {
+    system.get_working_directory(),
     pandoc.sha1(elem.text) .. '.svg'
   })
   if not file_exists(filepath) then
-    -- build source 
+    -- build source
     local source = ''
     if elem.t == 'Math' and elem.mathtype == 'DisplayMath' then
       source = displaymath_template:format(options.header, elem.text)
@@ -168,7 +182,7 @@ local function pre_render(elem)
   end
   -- return appropriate Pandoc element(s)
   if elem.t == 'Math' and elem.mathtype == 'DisplayMath' then
-    return {pandoc.LineBreak(), pandoc.Image(caption, filepath), 
+    return {pandoc.LineBreak(), pandoc.Image(caption, filepath),
         pandoc.LineBreak()}
   elseif elem.t == 'Math' and elem.mathtype == 'InlineMath' then
     return pandoc.Image(caption, filepath)
@@ -183,7 +197,7 @@ end
 -- @param meta Meta object
 function get_options(meta)
 
-  -- filter to complie tex header
+  -- filter to compile tex header
   local compile_tex_header = function(elem)
       -- nb, LaTeX written directly in markdown is format `tex`
       -- LaTeX written within a native raw or span is format `latex`
@@ -193,7 +207,7 @@ function get_options(meta)
   end
   -- function to collect LaTeX code in a meta element
   -- and store it into `options.header`
-  local collect_header_includes = function(meta_elem) 
+  local collect_header_includes = function(meta_elem)
     -- ensure it's a list
     if meta_elem.t ~= 'MetaList' then
       meta_elem = pandoc.MetaList({ meta_elem })
@@ -208,7 +222,7 @@ function get_options(meta)
       elseif item.t == 'MetaBlocks' then
         div = pandoc.Div(pandoc.List(item))
       end
-      if div ~= {} then 
+      if div ~= {} then
         pandoc.walk_block(div, {
           RawInline = compile_tex_header,
           RawBlock = compile_tex_header
@@ -243,7 +257,7 @@ function get_options(meta)
 
     -- ensure it's a map
     -- if not, we assume it's a `scope` option
-    if meta['pre-render'].t ~= 'MetaMap' then 
+    if meta['pre-render'].t ~= 'MetaMap' then
       meta['pre-render'] = pandoc.MetaMap({
         scope = meta['pre-render']
       })
@@ -260,7 +274,7 @@ function get_options(meta)
       options.exclude_formats = pandoc.List:new()
       -- ensure the value is a list
       if opt_map['exclude-formats'].t ~= 'MetaList' then
-        opt_map['exclude-formats'] = pandoc.MetaList({ 
+        opt_map['exclude-formats'] = pandoc.MetaList({
           opt_map['exclude-formats']
         })
       end
@@ -270,7 +284,7 @@ function get_options(meta)
       end
       -- do nothing if the present output format is excluded
       for _,format in ipairs(options.exclude_formats) do
-        if FORMAT:match(format) then 
+        if FORMAT:match(format) then
           options.do_something = false
           break
         end
@@ -283,15 +297,20 @@ function get_options(meta)
   end
 
   -- metadata's `header-includes`: gather LaTeX
-  if meta['header-includes'] and not (meta['pre-render'] 
+  if meta['header-includes'] and not (meta['pre-render']
     and meta['pre-render']['use-header'] == false) then
     collect_header_includes(meta['header-includes'])
+  end
+
+  -- set the inkscape option
+  if meta['inkscape'] then
+    options.inkscape = true
   end
 
 end
 
 -- # Main set of filters
--- Get options, then apply the pre-render function to math 
+-- Get options, then apply the pre-render function to math
 -- and raw elements within selected divs
 return {
   {
