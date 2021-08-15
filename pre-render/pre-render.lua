@@ -71,10 +71,16 @@ local options = {
   exclude_formats = {'latex'}, -- default format to exclude
   do_something = true, -- false to deactivate the filter
   header = '', -- store for header-includes LaTeX code
-  inkscape = false -- use inkscape instead of pdf2svg
+  inkscape = false, -- use inkscape instead of pdf2svg
+  filetype = 'svg', -- default to SVG
 }
 local acceptable_scopes = pandoc.List:new(
   {'all', 'math', 'raw', 'none', 'selected'})
+  
+if FORMAT == 'docx' or FORMAT == 'pptx' or FORMAT == 'rtf' then
+    options.filetype = 'png'
+    options.inkscape = true -- PNG is so far only supported by Inkscape
+end
 
 -- # Helper functions
 
@@ -121,15 +127,28 @@ local function math2image(source, filepath)
         'math.tex'
       }, '')
       if options.inkscape then
-        pandoc.pipe('inkscape',
-            {
-                'math.pdf',
-                '--export-type=svg',
-                '--export-plain-svg',
-                '--pdf-poppler',
-                '--export-filename=' .. filepath
-            },
-        '')
+        -- these formats prefer PNG to SVG
+        if options.filetype == 'png' then
+            pandoc.pipe('inkscape',
+                {
+                    'math.pdf',
+                    '--export-type=png',
+                    '--export-dpi=300',
+                    '--pdf-poppler',
+                    '--export-filename=' .. filepath
+                },
+            '')
+        else
+            pandoc.pipe('inkscape',
+                {
+                    'math.pdf',
+                    '--export-type=svg',
+                    '--export-plain-svg',
+                    '--pdf-poppler',
+                    '--export-filename=' .. filepath
+                },
+            '')
+         end
       else
         pandoc.pipe('pdf2svg', {'math.pdf', filepath}, '')
       end
@@ -157,7 +176,7 @@ local function pre_render(elem)
 
   local filepath = path.join( {
     system.get_working_directory(),
-    pandoc.sha1(elem.text) .. '.svg'
+    pandoc.sha1(elem.text) .. '.' .. options.filetype
   })
   if not file_exists(filepath) then
     -- build source
