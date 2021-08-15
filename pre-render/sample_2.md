@@ -14,6 +14,7 @@ abstract: |
   methodological power of reflective equilibrium is merely nominal.
 header-includes: |
   ```{=latex}
+  \usepackage{amsfonts}
   \usepackage{bussproofs}
   \EnableBpAbbreviations
   ```
