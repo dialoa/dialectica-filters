@@ -49,7 +49,7 @@ would do better to render this premise as "$\forall x (Wx\to Mx)$", with
 "$W$" standing for *man* and $x$ ranging over a (generic) class of
 objects. (Note that this is already a good step away from the"surface"
 grammar of English.) So we get an improved rendering of (arg), namely:
-`$$\AXC{$\forall x (Wx\to Mx)$} \UIC{$Ms$} \DP$$`{.pre-render} 
+[$$\AXC{$\forall x (Wx\to Mx)$} \UIC{$Ms$} \DP$$]{.pre-render} 
 the validity of which we check in (tar).[^8] Obviously, it is not.
 
 [^8]: Actually, since (tar) is rather imprecise, the validity check
@@ -115,7 +115,7 @@ surface and how.
 A third example will also illustrate the fact that, in many cases, the
 practice is not at all coherent and it cannot light our way in a simple
 fashion. Take the following rules governing a truth predicate $T$:
-`$$\AXC{$A$}\RightLabel{$T$-I} \UIC{$T\langle A\rangle$} \DP \hskip 20mm \AXC{$T\langle A\rangle$}\RightLabel{$T$-E} \UIC{$A$} \DP$$`{.pre-render} They seem innocuous enough. But add some equally innocuous
+[$$\AXC{$A$}\RightLabel{$T$-I} \UIC{$T\langle A\rangle$} \DP \hskip 20mm \AXC{$T\langle A\rangle$}\RightLabel{$T$-E} \UIC{$A$} \DP$$]{.pre-render} They seem innocuous enough. But add some equally innocuous
 reasoning principles and pick the sentence named by $\langle A\rangle$
 so that it is "This sentence is false" and all hell breaks loose,
 i.e. any sentence follows from any sentence.[^11] Deciding how to handle
@@ -198,7 +198,7 @@ account of harmony as conservativeness, is sacrosanct.
 
 Our starting point is Gentzen's sequent calculus for classical logic,
 $LK$\ . Recall that this contains the Cut rule:
-`$$\AXC{$X:Y,A$} \AXC{$A,X:Y$} \BIC{$X:Y$} \DP$$`{.pre-render} Now if one were to add e.g. the $T$-rules from above to
+[$$\AXC{$X:Y,A$} \AXC{$A,X:Y$} \BIC{$X:Y$} \DP$$]{.pre-render} Now if one were to add e.g. the $T$-rules from above to
 $LK$, then the system would become trivial: any conclusion would follow
 from any premisses. To see this, let $\lambda$ be a sentence such that
 $\lambda \equiv_{df} \neg T\langle \lambda \rangle$. Thus $\lambda$ is
