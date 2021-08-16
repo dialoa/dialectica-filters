@@ -62,8 +62,8 @@ local rawblock_template = [[
 local rawinline_template = rawblock_template
 
 -- templates for captions
-local math_caption_template = "Math formula from LaTeX code: %s"
-local raw_caption_template = "Element typeset from LaTeX code: %s"
+local math_caption_template = "Math formula from LaTeX code: `%s`{.latex}"
+local raw_caption_template = "Element typeset from LaTeX code: `%s{.latex}`"
 
 -- options map
 local options = {
@@ -195,12 +195,17 @@ local function pre_render(elem)
     end
     math2image(source, filepath)
   end
-  -- build caption
+  -- build caption; this will be a Pandoc object read from the
+  -- caption templates, treated as markdown
   local caption = ''
   if elem.t == 'Math' then
-    caption = math_caption_template:format(elem.text)
+    caption = pandoc.utils.blocks_to_inlines(
+        pandoc.read(math_caption_template:format(elem.text), 'markdown').blocks
+    )
   else
-    caption = raw_caption_template:format(elem.text)
+    caption = pandoc.utils.blocks_to_inlines(
+        pandoc.read(raw_caption_template:format(elem.text), 'markdown').blocks
+    )
   end
   -- return appropriate Pandoc element(s)
   if elem.t == 'Math' and elem.mathtype == 'DisplayMath' then
