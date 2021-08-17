@@ -26,21 +26,18 @@ Requirements
 ============
 
 Relies on [Pandoc](https://pandoc.org) and a LaTeX installation that
-includes [dvisvgm]
-(https://ctan.org/tex-archive/dviware/dvisvgm?lang=en) (included in
+includes [dvisvgm](https://ctan.org/tex-archive/dviware/dvisvgm?lang=en) (included in
 TexLive and MikTeX). 
 
 Save the `pre-render.lua` file at a location that Pandoc will find.
-See [Pandoc's manual]
-(https://pandoc.org/MANUAL.html#option--lua-filter) on how to use Lua
+See [Pandoc's manual](https://pandoc.org/MANUAL.html#option--lua-filter) on how to use Lua
 filters. 
 
 Usage
 =====
 
 In our markdown source, embed the math or LaTeX raw code you want to 
-pre-render within [native Div or Span elements]
-(https://pandoc.org/MANUAL.html#divs-and-spans) 
+pre-render within [native Div or Span elements](https://pandoc.org/MANUAL.html#divs-and-spans) 
 with the class `pre-render`. Here is a Div containing a display
 math formula:
 
@@ -73,8 +70,7 @@ A Div containing a Raw LaTeX code block:
 
 If rendering your LaTeX requires some preamble code (command definitions
 or loading packages) these should be included in your
- [document's metadata `header-includes` field]
-(https://pandoc.org/MANUAL.html#extension-yaml_metadata_block).
+ [document's metadata `header-includes` field](https://pandoc.org/MANUAL.html#extension-yaml_metadata_block).
 Since you're using this filter you're probably targeting formats other
 that LaTeX, so the LaTeX code in `header-includes` should be embedded
 between `\`\`\`{=latex}` and `\`\`\`` lines or `~~~{=latex}` and `~~~`
