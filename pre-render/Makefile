@@ -15,5 +15,15 @@ expected.html: pre-render.lua sample.md
 	@pandoc --standalone --lua-filter pre-render.lua --to=html sample.md \
 	--output expected.html
 
+bitmap: pre-render.lua sample.md expected-bitmap
+	@pandoc --standalone --lua-filter pre-render.lua --to=html sample.md \
+		-M pre-render-format=bitmap \
+		| $(DIFF) expected.html -
+
+expected-bitmap:
+	@pandoc --standalone --lua-filter pre-render.lua --to=html sample.md \
+		-M pre-render-format=bitmap \
+	--output expected.html
+	
 clean:
 	@rm -f *.svg *.png expected.html expected.pdf

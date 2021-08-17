@@ -2,12 +2,7 @@
 pre-render:
     scope: selected # change to all to pre-render all instead
     exclude-formats: [latex,markdown] # don't convert in markdown
-    header-includes: |
-        ```{=latex} 
-        \usepackage{amssymb}
-        %\usepackage{lmodern}
-        \usepackage{unicode-math}
-        ```
+    header-includes: 
     use-header: false # false will ignore the main header-includes 
 author: Julien Dutant
 title: Pre-render filter sample document

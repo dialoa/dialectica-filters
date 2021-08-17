@@ -22,11 +22,9 @@ with class "pre-render" will be pre-rendered as svg or png images.
 -- @TODO get errors from lualatex and pdf2svg, but silent otherwise. 
 -- @TODO don't get messages from inkscape unless --verbose is on
 -- @TODO use pdf and ghostscript if available (seems safer for fonts)
--- @TODO test with xelatex fonts
--- @TODO Use png for formats that don't handle SVG (docx, pptx, rtf)
--- @TODO improve code following diagram-generator style
--- @TODO for Math return Spans with `math display` or `math inline` classes,
---    like Pandoc
+-- @TODO test with xelatex fonts; option to choose pdf engine
+--      NB: no way of reading the --pdf-engine option
+-- @TODO in non-html outputs display math requires linebreaks
 -- @TODO fix font sizes (1.21 times bigger, says Katex?)
 
 -- # Global variables
@@ -209,15 +207,17 @@ local function pre_render(elem)
     )
   end
   -- return appropriate Pandoc element(s)
+  local image = pandoc.Image(caption, filepath)
   if elem.t == 'Math' and elem.mathtype == 'DisplayMath' then
-    return {pandoc.LineBreak(), pandoc.Image(caption, filepath),
-        pandoc.LineBreak()}
+    image.classes = {'math','display'}
+    return image
   elseif elem.t == 'Math' and elem.mathtype == 'InlineMath' then
-    return pandoc.Image(caption, filepath)
+    image.classes = {'math','inline'}
+    return image
   elseif elem.t == 'RawBlock' then
-    return pandoc.Para({ pandoc.Image(caption, filepath) })
+    return pandoc.Para({ image })
   else -- RawInline
-    return pandoc.Image(caption, filepath)
+    return image
   end
 end
 
