@@ -16,4 +16,4 @@ expected.html: pre-render.lua sample.md
 	--output expected.html
 
 clean:
-	@rm *.svg expected.html expected.pdf
+	@rm -f *.svg *.png expected.html expected.pdf

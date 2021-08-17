@@ -19,7 +19,8 @@ with class "pre-render" will be pre-rendered as svg or png images.
 -- in pandoc's documentation <https://pandoc.org/lua-filters.html#examples>
 -- @TODO add metadata option to specify raw LaTeX file
 -- @TODO convert the caption in proper pandoc code (split by spaces)
--- @TODO get errors from lualatex and dvisvgm, but silent otherwise
+-- @TODO get errors from lualatex and pdf2svg, but silent otherwise. 
+-- @TODO don't get messages from inkscape unless --verbose is on
 -- @TODO use pdf and ghostscript if available (seems safer for fonts)
 -- @TODO test with xelatex fonts
 -- @TODO Use png for formats that don't handle SVG (docx, pptx, rtf)
@@ -35,11 +36,30 @@ local path = require('pandoc.path')
 
 -- local mediabag = require 'pandoc.mediabag' -- to be added later
 
+-- options map
+local options = {
+  scope = 'selected', -- `selected`, `all`, `math`, `raw`, `none`
+  exclude_formats = {'latex'}, -- default format to exclude
+  do_something = true, -- false to deactivate the filter
+  header = '', -- store for header-includes LaTeX code
+  inkscape = false, -- use inkscape instead of pdf2svg
+  filetype = 'svg', -- default to SVG
+}
+-- default to `png` if the output format requires it
+if FORMAT == 'docx' or FORMAT == 'pptx' or FORMAT == 'rtf' then
+  options.filetype = 'png'
+  options.inkscape = true -- PNG is so far only supported by Inkscape
+end
+
+local acceptable_scopes = pandoc.List:new(
+  {'all', 'math', 'raw', 'none', 'selected'})
+
 -- LaTeX document templates
 --  for display math we use \displaystyle
 --  see <https://tex.stackexchange.com/questions/50162/how-to-make-a-standalone-document-with-one-equation>
 local inlinemath_template = [[
   \documentclass{standalone}
+  \usepackage{amsmath,amssymb,lmodern,unicode-math}
   %s
   \begin{document}
   $%s$
@@ -47,6 +67,7 @@ local inlinemath_template = [[
 ]]
 local displaymath_template = [[
   \documentclass{standalone}
+  \usepackage{amsmath,amssymb,lmodern,unicode-math}
   %s
   \begin{document}
   $\displaystyle
@@ -64,23 +85,6 @@ local rawinline_template = rawblock_template
 -- templates for captions
 local math_caption_template = "Math formula from LaTeX code: `%s`{.latex}"
 local raw_caption_template = "Element typeset from LaTeX code: `%s{.latex}`"
-
--- options map
-local options = {
-  scope = 'selected', -- `selected`, `all`, `math`, `raw`, `none`
-  exclude_formats = {'latex'}, -- default format to exclude
-  do_something = true, -- false to deactivate the filter
-  header = '', -- store for header-includes LaTeX code
-  inkscape = false, -- use inkscape instead of pdf2svg
-  filetype = 'svg', -- default to SVG
-}
-local acceptable_scopes = pandoc.List:new(
-  {'all', 'math', 'raw', 'none', 'selected'})
-
-if FORMAT == 'docx' or FORMAT == 'pptx' or FORMAT == 'rtf' then
-    options.filetype = 'png'
-    options.inkscape = true -- PNG is so far only supported by Inkscape
-end
 
 -- # Helper functions
 
@@ -167,9 +171,6 @@ end
 -- unless we already have an image for that element's code
 -- @param elem math element to be pre-rendered
 local function pre_render(elem)
-
-    -- print(FORMAT)
-    -- print(options.exclude_formats)
 
   -- if Raw, only process `latex` or `tex`
   if (elem.t == 'RawInline' or elem.t == 'RawBlock')
@@ -258,37 +259,37 @@ function get_options(meta)
     end
   end
 
+  -- ensure `pre-render` is a map
+  -- if not, we assume it's a `scope` value
+  if meta['pre-render'] and meta['pre-render'].t ~= 'MetaMap' then
+      meta['pre-render'] = pandoc.MetaMap({
+        scope = pandoc.utils.stringify(meta['pre-render'])
+      })
+  end
+
   -- syntactic sugar: convert aliases to official
   -- conflict behaviour: the alias is used (as it may be provided
   -- on the command line to override the one specified in the document)
-  local keys_with_aliases = {'scope', 'use-header'}
+  local keys_with_aliases = {'scope', 'use-header', 'format', 'inkscape'}
   for _,key in ipairs(keys_with_aliases) do
     if meta['pre-render-' .. key] ~= nil then
-      -- warn if clash
+      -- create an empty `pre-render` map if needed
       if not meta['pre-render'] then
-        meta['pre-render'] = pandoc.MetaMap({
-          key = meta['pre-render-' .. key]
-          })
-      elseif meta['pre-render'][key] == nil then
-        meta['pre-render'][key] = meta['pre-render-' .. key]
-      else
+        meta['pre-render'] = pandoc.MetaMap({})
+      end
+      -- warn if clash
+      if meta['pre-render'][key] ~= nil then
         message('WARNING', 'option `pre-render-' .. key .. '` replaces '
            .. 'the option `' .. key .. '` in `pre-render`.')
-        meta['pre-render'][key] = meta['pre-render-' .. key]
       end
+      meta['pre-render'][key] = meta['pre-render-' .. key]
+      meta['pre-render-' .. key] = nil
     end
   end
 
-  -- `pre-render` map of options
+  -- collect options from the `meta['pre-render'] map
   if meta['pre-render'] then
 
-    -- ensure it's a map
-    -- if not, we assume it's a `scope` option
-    if meta['pre-render'].t ~= 'MetaMap' then
-      meta['pre-render'] = pandoc.MetaMap({
-        scope = meta['pre-render']
-      })
-    end
     local opt_map = meta['pre-render']
     -- `scope`
     if opt_map.scope then
@@ -309,21 +310,29 @@ function get_options(meta)
       for _,item in ipairs(opt_map['exclude-formats']) do
         options.exclude_formats:insert(pandoc.utils.stringify(item))
       end
-      -- do nothing if the present output format is excluded
-      -- for _, format in ipairs(options.exclude_formats) do
-      --   if FORMAT:match(format) then
-      --     options.do_something = false
-      --     break
-      --   end
-      -- end
     end
     -- `header-includes`: gather LaTeX
     if opt_map['header-includes'] then
       collect_header_includes(opt_map['header-includes'])
     end
+    -- `format`: image format
+    if opt_map['format'] then
+      local str = string.lower(pandoc.utils.stringify(opt_map['format']))
+      if str == 'png' or str == 'raster' or str == 'bitmap' then
+        options.filetype = 'png'
+        options.inkscape = true -- PNG is so far only supported by Inkscape
+      end
+    end
+    -- set the inkscape option
+    if opt_map['inkscape'] and opt_map['inkscape'] ~= false then
+      options.inkscape = true
+    end
+
   end
 
-  -- ignore if the format is in the exclude_formats options
+  -- process options
+
+  -- do nothing if the format is in the `exclude_formats` options
   for _, format in ipairs(options.exclude_formats) do
     if FORMAT:match(format) then
         options.do_something = false
@@ -337,10 +346,7 @@ function get_options(meta)
     collect_header_includes(meta['header-includes'])
   end
 
-  -- set the inkscape option
-  if meta['inkscape'] then
-    options.inkscape = true
-  end
+  return meta
 
 end
 

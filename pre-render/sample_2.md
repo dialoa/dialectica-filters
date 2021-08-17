@@ -18,6 +18,8 @@ header-includes: |
   \usepackage{bussproofs}
   \EnableBpAbbreviations
   ```
+pre-render:
+    header-includes: \usepackage{lmodern}\usepackage{unicode-math}
 ---
 
 
