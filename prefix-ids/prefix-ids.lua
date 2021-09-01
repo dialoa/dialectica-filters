@@ -9,7 +9,7 @@
 -- # Global variables
 local prefix = ''
 local old_identifiers = pandoc.List:new()
-local prefix_crossref = true
+local pandoc_crossref = true
 local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
 
 --- get_options: get filter options for document's metadata
@@ -20,9 +20,9 @@ function get_options(meta)
         if meta['prefix-ids']['prefix'] then
             prefix = pandoc.utils.stringify(meta['prefix-ids']['prefix'])
         end
-        if meta['prefix-ids']['prefix-crossref'] 
-          and meta['prefix-ids']['prefix-crossref'] == false then
-            prefix_crossref = nil
+        if meta['prefix-ids']['pandoc-crossref'] 
+          and meta['prefix-ids']['pandoc-crossref'] == false then
+            pandoc_crossref = nil
         end
         
     end
@@ -49,7 +49,7 @@ function process_doc(doc)
             old_identifiers:insert(el.identifier)
             local new_identifier = ''
             -- if pandoc-crossref type, we add the prefix after "fig:"
-            if prefix_crossref then 
+            if pandoc_crossref then 
                 local type = el.identifier:match('^(%a+):')
                 if crossref_prefixes:find(type) then
                     new_identifier = type .. ':' .. prefix 
@@ -94,7 +94,7 @@ function process_doc(doc)
           and old_identifiers:find(link.target:sub(2,-1)) then
             local target = link.target:sub(2,-1)
             -- handle pandoc-crossref types targets if needed
-            if prefix_crossref then
+            if pandoc_crossref then
                 local type = target:match('^(%a+):')
                 if crossref_prefixes:find(type) then
                     target = '#' .. type .. ':' .. prefix 
@@ -127,7 +127,7 @@ function process_doc(doc)
 
     div = pandoc.walk_block(pandoc.Div(doc.blocks), {
         Link = add_prefix_to_link,
-        Cite = prefix_crossref and add_prefix_to_crossref_cites
+        Cite = pandoc_crossref and add_prefix_to_crossref_cites
     })
     doc.blocks = div.content
 
