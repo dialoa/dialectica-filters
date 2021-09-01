@@ -35,6 +35,8 @@ On the other hand, Pandoc's [`id_prefix` option](https://pandoc.org/MANUAL.html#
 outputs, and this function can't control them. So this function
 is best used for non-HTML only.
 
+The filter can be used together with [Pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/).
+
 Usage
 -----
 
@@ -48,6 +50,16 @@ If the filter is in Pandoc's `$DATADIR` there is no need to give its
 path. See [Pandoc's manual[
 (https://pandoc.org/MANUAL.html#general-options) for details.
 
+If using [Pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/),
+this filter should be applied first:
+
+```bash 
+pandoc -L prefix-ids.lua -F pandoc-crossref source.md -o output.html
+```
+
+Options
+-------
+
 A custom prefix can be specified in the document metadata:
 
 ```yaml
@@ -57,6 +69,17 @@ prefix-ids:
 
 If no prefix is specified, the filter will use a random 40-char string
 of letters and numbers (`sha1` of the document's body).
+
+By default the filter handles [Pandoc-crossref]
+(https://lierdakil.github.io/pandoc-crossref/) syntax: an identifier
+`#fig:figure1` becomes `#fig:prefixfigure1`. To disable this behaviour
+set the pandoc-crossref suboption to false:
+
+```yaml
+prefix-ids:
+  pandoc-crossref: false
+```
+
 
 Warning
 -------
