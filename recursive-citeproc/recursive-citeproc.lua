@@ -124,9 +124,6 @@ end
 function recursive_citeproc(document)
 
     local all_cites, nocite_cites = collect_citations_ids(document)
-    -- citations_added = true -- to ensure a first pass
-
-    -- while citations_added do
 
     -- build arguments for running pandoc with citeproc
     local arguments = pandoc.List:new()
@@ -151,7 +148,8 @@ function recursive_citeproc(document)
 
     -- check whether citations have been added (or nocite contains @*)
     local new_all_cites, nocite_cites = collect_citations_ids(new_doc)
-    if nocite_cites:find('*') or #new_all_cites == #all_cites then
+    if (nocite_cites and nocite_cites:find('*')) 
+        or #new_all_cites == #all_cites then
         new_doc.meta['suppress-bibliography'] = true
         return new_doc
     else

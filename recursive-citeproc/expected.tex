@@ -4,10 +4,6 @@
 %
 \documentclass[
 ]{article}
-\title{Self-citing bibliography example}
-\author{Julien Dutant}
-\date{}
-
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
 \usepackage{iftex}
@@ -76,6 +72,10 @@
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
+\title{Self-citing bibliography example}
+\author{Julien Dutant}
+\date{}
+
 \begin{document}
 \maketitle
 
@@ -87,13 +87,11 @@
 Doe, Jane E. 1980. \emph{A Long Journey}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-Doe1990}{}}%
----------. 1990. \emph{A Long Journey}. Reprint
-of~\protect\hyperlink{ref-Doe1980}{Doe}
+---------. 1990. \emph{A Long Journey}. Reprint of~Doe
 (\protect\hyperlink{ref-Doe1980}{1980}).
 
 \leavevmode\vadjust pre{\hypertarget{ref-Doe2000}{}}%
----------. 2000. \emph{A Long Journey}. Reprint
-of~\protect\hyperlink{ref-Doe1990}{Doe}
+---------. 2000. \emph{A Long Journey}. Reprint of~Doe
 (\protect\hyperlink{ref-Doe1990}{1990}).
 
 \leavevmode\vadjust pre{\hypertarget{ref-Smith1980}{}}%
