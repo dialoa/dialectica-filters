@@ -9,6 +9,8 @@
 -- # Global variables
 local prefix = ''
 local old_identifiers = pandoc.List:new()
+local prefix_crossref = true
+local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
 
 --- get_options: get filter options for document's metadata
 -- @param meta pandoc Meta element
@@ -17,6 +19,10 @@ function get_options(meta)
 
         if meta['prefix-ids']['prefix'] then
             prefix = pandoc.utils.stringify(meta['prefix-ids']['prefix'])
+        end
+        if meta['prefix-ids']['prefix-crossref'] 
+          and meta['prefix-ids']['prefix-crossref'] == false then
+            prefix_crossref = nil
         end
         
     end
@@ -41,9 +47,30 @@ function process_doc(doc)
     add_prefix = function (el) 
         if el.identifier and el.identifier ~= '' then
             old_identifiers:insert(el.identifier)
-            local new_identifier = prefix .. el.identifier
+            local new_identifier = ''
+            -- if pandoc-crossref type, we add the prefix after "fig:"
+            if prefix_crossref then 
+                local type = el.identifier:match('^(%a+):')
+                if crossref_prefixes:find(type) then
+                    new_identifier = type .. ':' .. prefix 
+                        .. el.identifier:match('^%a+:(.*)')
+                else
+                    new_identifier = prefix .. el.identifier
+                end
+            else
+                new_identifier = prefix .. el.identifier
+            end
             el.identifier = new_identifier
             return el
+        end
+    end
+    -- add_prefix_string function
+    -- same as add_prefix but for pandoc-crossref "{eq:label}" strings
+    add_prefix_string = function(el)
+        local eq_identifier = el.text:match('{#eq:(.*)}')
+        if eq_identifier then
+            old_identifiers:insert('eq:' .. eq_identifier)
+            return pandoc.Str('{#eq:' .. prefix .. eq_identifier .. '}')
         end
     end
 
@@ -56,21 +83,51 @@ function process_doc(doc)
         Div = add_prefix,
         Header = add_prefix,
         Table = add_prefix,
-        CodeBlock = add_prefix,        
+        CodeBlock = add_prefix,
+        Str = add_prefix_string,
     })
     doc.blocks = div.content
 
+    -- function to add prefixes to links
     local add_prefix_to_link = function (link)
         if link.target:sub(1,1) == '#' 
           and old_identifiers:find(link.target:sub(2,-1)) then
-            new_target = '#' .. prefix .. link.target:sub(2,-1)
-            link.target = new_target
+            local target = link.target:sub(2,-1)
+            -- handle pandoc-crossref types targets if needed
+            if prefix_crossref then
+                local type = target:match('^(%a+):')
+                if crossref_prefixes:find(type) then
+                    target = '#' .. type .. ':' .. prefix 
+                        .. target:match('^%a+:(.*)')
+                else
+                    target = '#' .. prefix .. target
+                end
+            else
+                target = '#' .. prefix .. target
+            end
+            link.target = target
             return link 
         end
     end
+    -- function to add prefixes to pandoc-crossref citations
+    -- looking for keys starting with `fig:`, `sec:`, `eq:`, ... 
+    local add_prefix_to_crossref_cites = function (cite)
+        for i = 1, #cite.citations do
+            local type = cite.citations[i].id:match('^(%a+):')
+            if crossref_prefixes:find(type) then
+                local target = cite.citations[i].id:match('^%a+:(.*)')
+                if old_identifiers:find(type .. ':' .. target) then
+                    target = prefix .. target
+                    cite.citations[i].id = type .. ':' .. target
+                end
+            end
+        end
+        return cite
+    end
 
     div = pandoc.walk_block(pandoc.Div(doc.blocks), {
-        Link = add_prefix_to_link
+        Link = add_prefix_to_link,
+        Cite = prefix_crossref and add_prefix_to_crossref_cites
     })
     doc.blocks = div.content
 
