@@ -83,7 +83,7 @@ function catch(doc)
 	local file = io.open(filename, 'w')
 	file:write(to_json(doc))
 	file:close()
-	return pandoc.Pandoc({},{})
+	-- return pandoc.Pandoc({},{})
 end
 
 return{{
