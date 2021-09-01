@@ -80,6 +80,16 @@ prefix-ids:
   pandoc-crossref: false
 ```
 
+Aliases of these options are provided to allow you to set them from 
+the command line: `prefixs-ids-prefix` and `prefix-ids-pandoc-crossref`. 
+Use the [Pandoc option `-M` 
+(`--metadata`)](https://pandoc.org/MANUAL.html#option--metadata) to do so:
+
+```
+pandoc -L prefix-ids.lua sample.md -o out.html -M prefix-ids-pandoc-crossref=false
+```
+
+If both standard and alias are provided, the latter prevails.
 
 Warning
 -------
