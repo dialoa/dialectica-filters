@@ -15,17 +15,34 @@ local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
 --- get_options: get filter options for document's metadata
 -- @param meta pandoc Meta element
 function get_options(meta)
-    if meta['prefix_ids'] then
+
+    -- syntactic sugar: options aliases
+    -- merging behaviour: aliases prevail
+    local aliases = {'prefix', 'pandoc-crossref'}
+    for _,alias in ipairs(aliases) do
+        if meta['prefix-ids-' .. alias] ~= nil then
+            -- create a 'prefix-ids' key if needed
+            if not meta['prefix-ids'] then
+                meta['prefix-ids'] = pandoc.MetaMap({})
+            end
+            meta['prefix-ids'][alias] = meta['prefix-ids-' .. alias]
+            meta['prefix-ids-' .. alias] = nil
+        end
+    end
+
+    -- save options in global variables
+    if meta['prefix-ids'] then
 
         if meta['prefix-ids']['prefix'] then
             prefix = pandoc.utils.stringify(meta['prefix-ids']['prefix'])
         end
-        if meta['prefix-ids']['pandoc-crossref'] 
+        if meta['prefix-ids']['pandoc-crossref'] ~= nil 
           and meta['prefix-ids']['pandoc-crossref'] == false then
-            pandoc_crossref = nil
+            pandoc_crossref = false
         end
         
     end
+    return meta
 end
 
 --- process_doc: process the pandoc document
@@ -84,7 +101,7 @@ function process_doc(doc)
         Header = add_prefix,
         Table = add_prefix,
         CodeBlock = add_prefix,
-        Str = add_prefix_string,
+        Str = pandoc_crossref and add_prefix_string
     })
     doc.blocks = div.content
 
