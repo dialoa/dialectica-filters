@@ -148,7 +148,7 @@ function recursive_citeproc(document)
 
     -- check whether citations have been added (or nocite contains @*)
     local new_all_cites, nocite_cites = collect_citations_ids(new_doc)
-    if nocite_cites:find('*') or #new_all_cites == #all_cites then
+    if nocite_cites:find('*')or #new_all_cites == #all_cites then
         new_doc.meta['suppress-bibliography'] = true
         return new_doc
     else
@@ -186,6 +186,8 @@ end
 -- # Main filters
 
 return {
-        Meta = get_options
+    {
+        Meta = get_options,
         Pandoc = recursive_citeproc
+    }
 }
