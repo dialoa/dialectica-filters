@@ -6,7 +6,12 @@ author: "Julien Dutant"
 Prefix-ids
 ==========
 
-Add prefix to all identifiers in Pandoc document
+Add prefix to all identifiers in Pandoc document. Consists of two filters:
+
+- `crossref-prefix-ids`: prefix pandoc-crossref identifiers and the corresponding citation links
+- `prefix-ids`: prefix standard identifiers and internal links to them
+
+The former should be applied *before* `pandoc-crossref` is applied. The second is to be applied after other identifier/link generating filters are applied, notably after citeproc. 
 
 v0.1. Copyright: © 2021 Julien Dutant <julien.dutant@kcl.ac.uk>
 License:  MIT - see LICENSE file for details.
@@ -50,11 +55,25 @@ If the filter is in Pandoc's `$DATADIR` there is no need to give its
 path. See [Pandoc's manual[
 (https://pandoc.org/MANUAL.html#general-options) for details.
 
-If using [Pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/),
-this filter should be applied first:
+If using [Pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/) and targeting LaTeX output, 
+the `crossref-prefix` filter should be used
+to, placed before crossref. A standard order would then be `crossref-prefix`,
+`pandoc-crossref`, `citeproc` and then `predix-ids`:
 
 ```bash 
-pandoc -L prefix-ids.lua -F pandoc-crossref source.md -o output.html
+pandoc -L crossref-prefix.lua -F pandoc-crossref --citeproc -L prefix-ids.lua  source.md -o output.html
+```
+
+If using Pandoc-crossref but not 
+
+These can be specified in a defaults yaml file, called with `pandoc -d defaults.yaml source.md -o output.html`:
+
+```yaml
+filters:
+- crossref-prefix.lua
+- pandoc-crossref
+- citeproc
+- prefix-ids.lua
 ```
 
 Options

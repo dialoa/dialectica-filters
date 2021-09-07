@@ -1,21 +1,107 @@
-\hypertarget{sec:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73intro}{%
-\section{Introduction}\label{sec:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73intro}}
+\hypertarget{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}{%
+\section{Introduction}\label{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}}
 
-\protect\hypertarget{a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73ref}{}{This}
-is fine. See the
-\protect\hyperlink{sec:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73intro}{introduction}.
+\protect\hypertarget{ref}{}{This span's id} is changed.
+This\protect\hyperlink{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}{introduction}
+link, or again \protect\hyperlink{introduction}{as a full-blown link} is
+changed. We handle citations too (Watson and Crick 1953).
 
 \begin{figure}
-\hypertarget{fig:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73image}{%
+\hypertarget{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image}{%
 \centering
 \includegraphics{file.ext}
-\caption{Caption}\label{fig:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73image}
+\caption{Caption}\label{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image}
 }
 \end{figure}
 
-\begin{equation}\protect\hypertarget{eq:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73myeq}{}{x + 2}\label{eq:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73myeq}\end{equation}
+\begin{equation}\protect\hypertarget{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}{}{x + 2}\label{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}\end{equation}
 
 Pandoc-crossref references:
-sec.~\ref{sec:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73intro},
-fig.~\ref{fig:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73image},
-eq.~\ref{eq:a2bfceedd5c130faf35a6e4ef05b81cc5fe8fd73myeq}.
+sec.~\ref{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro},
+fig.~\ref{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image},
+eq.~\ref{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}.
+
+\hypertarget{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label}{}
+\begin{longtable}[]{@{}lll@{}}
+\caption{\label{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label}Caption}\tabularnewline
+\toprule
+a & b & c \\
+\midrule
+\endfirsthead
+\toprule
+a & b & c \\
+\midrule
+\endhead
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{code-blocks}{%
+\section{Code blocks}\label{code-blocks}}
+
+Can be numbered:
+
+\begin{codelisting}
+
+\caption{Listing caption}
+
+\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode}{%
+\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode}}%
+\begin{Shaded}
+\begin{Highlighting}[]
+\OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
+\NormalTok{main }\OtherTok{=} \FunctionTok{putStrLn} \StringTok{"Hello World!"}
+\end{Highlighting}
+\end{Shaded}
+
+\end{codelisting}
+
+Or use table syntax to get captions, with label as an id attribute:
+
+\begin{codelisting}
+
+\caption{Listing caption}
+
+\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}{%
+\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}}%
+\begin{Shaded}
+\begin{Highlighting}[]
+\OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
+\NormalTok{main }\OtherTok{=} \FunctionTok{putStrLn} \StringTok{"Hello World!"}
+\end{Highlighting}
+\end{Shaded}
+
+\end{codelisting}
+
+Or with label specified in the caption:
+
+\begin{codelisting}
+
+\caption{Listing caption}
+
+\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code}{%
+\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code}}%
+\begin{Shaded}
+\begin{Highlighting}[]
+\OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
+\NormalTok{main }\OtherTok{=} \FunctionTok{putStrLn} \StringTok{"Hello World!"}
+\end{Highlighting}
+\end{Shaded}
+
+\end{codelisting}
+
+See tbl.~\ref{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label} or
+lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode} or
+lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code} or
+lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}.
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-WatsonCrick1953}{}}%
+Watson, J. D., and F. H. C. Crick. 1953. {``Molecular Structure of
+Nucleic Acids: A Structure for Deoxyribose Nucleic Acid.''}
+\emph{Nature} 171 (4356): 737--38.
+\url{https://doi.org/10.1038/171737a0}.
+
+\end{CSLReferences}

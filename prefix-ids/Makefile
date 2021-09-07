@@ -4,18 +4,22 @@ DIFF ?= diff --strip-trailing-cr -u
 
 test: html tex
 
-html: prefix-ids.lua sample.md expected.html
-	@pandoc -L prefix-ids.lua -F pandoc-crossref --to=html sample.md \
-		| $(DIFF) expected.html -
+html: crossref-prefix.lua prefix-ids.lua sample.md expected.html
+	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+	--citeproc -L prefix-ids.lua sample.md \
+	--to=html | $(DIFF) expected.html -
 
-tex: prefix-ids.lua sample.md expected.tex
-	@pandoc -L prefix-ids.lua -F pandoc-crossref --to=latex sample.md \
-		| $(DIFF) expected.tex -
+tex: crossref-prefix.lua prefix-ids.lua sample.md expected.tex
+	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+	--citeproc -L prefix-ids.lua sample.md \
+	--to=latex | $(DIFF) expected.tex -
 
-expected.html: prefix-ids.lua sample.md
-	@pandoc -L prefix-ids.lua -F pandoc-crossref --to=html sample.md \
+expected.html: crossref-prefix.lua prefix-ids.lua sample.md
+	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+	--citeproc -L prefix-ids.lua sample.md \
 	--output expected.html
 
-expected.tex: prefix-ids.lua sample.md
-	@pandoc -L prefix-ids.lua -F pandoc-crossref --to=latex sample.md \
+expected.tex: crossref-prefix.lua prefix-ids.lua sample.md
+	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+	--citeproc -L prefix-ids.lua sample.md \
 	--output expected.tex

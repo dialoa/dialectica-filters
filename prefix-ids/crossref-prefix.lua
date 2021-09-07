@@ -1,4 +1,5 @@
---[[-- # Prefix-ids - Prefixings all ids in a Pandoc document
+--[[-- # Crossref-prefix - Prefixings pandoc-crossref ids 
+and links in a Pandoc document
 
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
@@ -9,7 +10,7 @@
 -- # Global variables
 local prefix = '' -- user's custom prefix
 local old_identifiers = pandoc.List:new() -- identifiers removed
-local ids_to_ignore = pandoc.List:new() -- identifiers to ignore
+local new_identifiers = pandoc.List:new() -- identifiers added
 local pandoc_crossref = true -- do we process pandoc-crossref links?
 local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
 local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst'}) -- in Str elements
@@ -43,10 +44,6 @@ function get_options(meta)
           and meta['prefix-ids']['pandoc-crossref'] == false then
             pandoc_crossref = false
         end
-        if meta['prefix-ids'].ignoreids and 
-            meta['prefix-ids'].ignoreids.t == 'MetaList' then
-            ids_to_ignore:extend(meta['prefix-ids'].ignoreids)
-        end
         
     end
 
@@ -77,11 +74,11 @@ function process_doc(doc)
     end
 
     -- add_prefix function
+    -- check that it's a pandoc-crossref type
     -- do not add prefixes to empty identifiers
-    -- store the old identifiers for fixing the links
-    add_prefix = function (el) 
-        if el.identifier and el.identifier ~= '' 
-            and not ids_to_ignore:find(el.identifier) then
+    -- store the old identifiers to later fix links
+    add_prefix = function (el)
+        if el.identifier and el.identifier ~= '' then
             -- if pandoc-crossref type, we add the prefix after "fig:", "tbl", ...
             -- though (like pandoc-crossref) we must ignore #lst:label unless there's 
             -- a caption attribute or the codeblock caption syntax is on
@@ -103,74 +100,69 @@ function process_doc(doc)
                     -- el by el, not worth it. 
                     else
                         old_identifiers:insert(type .. ':' .. identifier)
-                        el.identifier =  type .. ':' .. prefix .. identifier
+                        new_id =  type .. ':' .. prefix .. identifier
+                        el.identifier = new_id
+                        new_identifiers:insert(new_id)
                         return el
                     end
                 end
             -- if no pandoc_crossref action was taken, apply simple prefix
             else
                 old_identifiers:insert(el.identifier)
-                el.identifier = prefix .. el.identifier
+                new_id = prefix .. el.identifier
+                el.identifier = new_id
+                new_identifiers:insert(new_id)
                 return el
             end
         end
     end
-    -- add_prefix_string function
-    -- same as add_prefix but for pandoc-crossref "{eq:label}" strings
-    -- crossref_srt_prefixes tell us which ones to convert
+   -- add_prefix_string function
+    -- handles {#eq:label} for equations and {#tbl:label} or {#lst:label}
+    -- in table or listing captions. 
     add_prefix_string = function(el)
         local type, identifier = el.text:match('^{#(%a+):(.*)}')
-        if type and identifier 
-          and crossref_str_prefixes:find(type)
-          and not ids_to_ignore:find(type .. ':' .. identifier) then
+        if type and identifier and crossref_str_prefixes:find(type) then
             old_identifiers:insert(type .. ':' .. identifier)
             local new_id = type .. ':' .. prefix .. identifier
+            new_identifiers:insert(new_id)
             return pandoc.Str('{#' .. new_id .. '}')
         end
     end
 
-    -- apply the functions to all elements with identifier
+
+    -- apply the function to all elements with pandoc-crossref identifiers
     local div = pandoc.walk_block(pandoc.Div(doc.blocks), {
-        Span = add_prefix,
-        Link = add_prefix,
         Image = add_prefix,
-        Code = add_prefix,
-        Div = add_prefix,
         Header = add_prefix,
         Table = add_prefix,
         CodeBlock = add_prefix,
-        Str = pandoc_crossref and add_prefix_string
+        Str = add_prefix_string,
     })
     doc.blocks = div.content
 
-    -- function to add prefixes to links
+   -- function to add prefixes to links
     local add_prefix_to_link = function (link)
         if link.target:sub(1,1) == '#' 
           and old_identifiers:find(link.target:sub(2,-1)) then
             local target = link.target:sub(2,-1)
-            -- handle pandoc-crossref types targets if needed
-            if pandoc_crossref then
-                local type, identifier = target:match('^(%a+):(.*)')
-                if type and crossref_prefixes:find(type) then
-                    target = '#' .. type .. ':' .. prefix .. identifier
-                else
-                    target = '#' .. prefix .. target
-                end
-            else
-                target = '#' .. prefix .. target
+            local type = target:match('^(%a+):')
+            if crossref_prefixes:find(type) then
+                link.target = '#' .. type .. ':' .. prefix 
+                    .. target:match('^%a+:(.*)')
+                return link
             end
-            link.target = target
-            return link 
         end
     end
     -- function to add prefixes to pandoc-crossref citations
     -- looking for keys starting with `fig:`, `sec:`, `eq:`, ... 
     local add_prefix_to_crossref_cites = function (cite)
         for i = 1, #cite.citations do
-            local type, target = cite.citations[i].id:match('^(%a+):(.*)')
-            if type and crossref_prefixes:find(type) then
+            local type = cite.citations[i].id:match('^(%a+):')
+            if crossref_prefixes:find(type) then
+                local target = cite.citations[i].id:match('^%a+:(.*)')
                 if old_identifiers:find(type .. ':' .. target) then
-                    cite.citations[i].id = type .. ':' .. prefix .. target
+                    target = prefix .. target
+                    cite.citations[i].id = type .. ':' .. target
                 end
             end
         end
@@ -179,9 +171,16 @@ function process_doc(doc)
 
     div = pandoc.walk_block(pandoc.Div(doc.blocks), {
         Link = add_prefix_to_link,
-        Cite = pandoc_crossref and add_prefix_to_crossref_cites
+        Cite = add_prefix_to_crossref_cites
     })
     doc.blocks = div.content
+
+    -- set metadata (in case prefix-ids is ran later on)
+    -- save a list of ids changed
+    if not doc.meta['prefix-ids'] then
+        doc.meta['prefix-ids'] = pandoc.MetaMap({})
+    end
+    doc.meta['prefix-ids'].ignoreids = pandoc.MetaList(new_identifiers)
 
     -- return the result
     return doc
@@ -192,6 +191,8 @@ end
 return {
     {
         Meta = get_options,
-        Pandoc = process_doc
+        Pandoc = function(doc) 
+            if pandoc_crossref then return process_doc(doc) end
+        end,
     }
 }
