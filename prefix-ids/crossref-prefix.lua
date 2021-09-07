@@ -106,14 +106,13 @@ function process_doc(doc)
                         return el
                     end
                 end
-            -- if no pandoc_crossref action was taken, apply simple prefix
-            else
-                old_identifiers:insert(el.identifier)
-                new_id = prefix .. el.identifier
-                el.identifier = new_id
-                new_identifiers:insert(new_id)
-                return el
             end
+            -- if no pandoc_crossref action was taken, apply simple prefix
+            old_identifiers:insert(el.identifier)
+            new_id = prefix .. el.identifier
+            el.identifier = new_id
+            new_identifiers:insert(new_id)
+            return el
         end
     end
    -- add_prefix_string function
