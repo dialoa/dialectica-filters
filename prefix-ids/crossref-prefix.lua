@@ -110,10 +110,17 @@ function process_doc(doc)
                 end
             end
             -- if no pandoc_crossref action was taken, apply simple prefix
+            -- Warning: if `autoSectionLabels` is true, pandoc-crossref
+            -- will add `sec:` to Header element ids; so we anticipate that
             old_identifiers:insert(el.identifier)
             new_id = prefix .. el.identifier
             el.identifier = new_id
-            new_identifiers:insert(new_id)
+            if el.t == 'Header' 
+              and doc.meta.autoSectionLabels ~= false then
+                new_identifiers:insert('sec:' .. new_id)
+            else
+                new_identifiers:insert(new_id)
+            end
             return el
         end
     end
