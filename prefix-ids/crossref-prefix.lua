@@ -12,8 +12,10 @@ local prefix = '' -- user's custom prefix
 local old_identifiers = pandoc.List:new() -- identifiers removed
 local new_identifiers = pandoc.List:new() -- identifiers added
 local pandoc_crossref = true -- do we process pandoc-crossref links?
-local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
-local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst'}) -- in Str elements
+local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst',
+        'Fig','Sec','Eq','Tbl','Lst'})
+local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst',
+        'Eq','Tbl','Lst'}) -- found in Str elements (captions or after eq)
 local codeblock_captions = true -- is the codeblock caption syntax on?
 
 --- get_options: get filter options for document's metadata
@@ -156,12 +158,16 @@ function process_doc(doc)
     -- looking for keys starting with `fig:`, `sec:`, `eq:`, ... 
     local add_prefix_to_crossref_cites = function (cite)
         for i = 1, #cite.citations do
-            local type = cite.citations[i].id:match('^(%a+):')
-            if crossref_prefixes:find(type) then
-                local target = cite.citations[i].id:match('^%a+:(.*)')
-                if old_identifiers:find(type .. ':' .. target) then
-                    target = prefix .. target
-                    cite.citations[i].id = type .. ':' .. target
+            local type, identifier = cite.citations[i].id:match('^(%a+):(.*)')
+            if type and identifier and crossref_prefixes:find(type) then
+                -- put the type in lowercase to match Fig: and fig:
+                -- note that sec: cites might refer to an old identifier
+                -- that doesn't start with sec:
+                local stype = pandoc.text.lower(type)
+                if old_identifiers:find(stype..':'..identifier) or
+                  (stype == 'sec' and old_identifiers:find(identifier))
+                  then
+                    cite.citations[i].id = type..':'..prefix..identifier
                 end
             end
         end

@@ -166,10 +166,16 @@ function process_doc(doc)
     -- looking for keys starting with `fig:`, `sec:`, `eq:`, ... 
     local add_prefix_to_crossref_cites = function (cite)
         for i = 1, #cite.citations do
-            local type, target = cite.citations[i].id:match('^(%a+):(.*)')
-            if type and crossref_prefixes:find(type) then
-                if old_identifiers:find(type .. ':' .. target) then
-                    cite.citations[i].id = type .. ':' .. prefix .. target
+            local type, identifier = cite.citations[i].id:match('^(%a+):(.*)')
+            if type and identifier and crossref_prefixes:find(type) then
+                -- put the type in lowercase to match Fig: and fig:
+                -- note that sec: cites might refer to an old identifier
+                -- that doesn't start with sec:
+                local stype = pandoc.text.lower(type)
+                if old_identifiers:find(stype..':'..identifier) or
+                  (stype == 'sec' and old_identifiers:find(identifier))
+                  then
+                    cite.citations[i].id = type..':'..prefix..identifier
                 end
             end
         end
