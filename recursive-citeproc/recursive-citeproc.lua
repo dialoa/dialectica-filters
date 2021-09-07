@@ -68,7 +68,7 @@ function parse_nocite(nocite)
         end
     })
 
-    return #result > 0 and result or nil
+    return result
 end
 
 --- create_nocite_field: create a metadata nocite field from 
@@ -96,7 +96,7 @@ end
 -- @param doc pandoc Pandoc document
 function collect_citations_ids(doc)
     local all_list = pandoc.List:new()
-    local nocite_list = nil
+    local nocite_list = pandoc.List:new()
     if doc.meta.nocite then
         nocite_list = parse_nocite(doc.meta.nocite)
         if nocite_list then
@@ -148,8 +148,7 @@ function recursive_citeproc(document)
 
     -- check whether citations have been added (or nocite contains @*)
     local new_all_cites, nocite_cites = collect_citations_ids(new_doc)
-    if (nocite_cites and nocite_cites:find('*')) 
-        or #new_all_cites == #all_cites then
+    if nocite_cites:find('*') or #new_all_cites == #all_cites then
         new_doc.meta['suppress-bibliography'] = true
         return new_doc
     else
@@ -187,10 +186,6 @@ end
 -- # Main filters
 
 return {
-    {
         Meta = get_options
-    },
-    {
         Pandoc = recursive_citeproc
-    }
 }
