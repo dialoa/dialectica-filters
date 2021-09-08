@@ -343,8 +343,9 @@ local function write_meta(meta)
             end
         end
 
-        header_includes:insert(pandoc.RawBlock(FORMAT,
-            header_code[FORMAT]))
+        header_includes:insert(pandoc.MetaBlocks({
+            pandoc.RawBlock(FORMAT, header_code[FORMAT])
+        }))
 
         meta['header-includes'] = header_includes
 
