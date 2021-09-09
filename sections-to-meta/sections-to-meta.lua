@@ -11,19 +11,21 @@ and `keywords` section to metadata
 
 -- abstract, thanks: list of blocks
 -- keywords: list of list of blocks
-local abstract = pandoc.List:new({})
-local thanks = pandoc.List:new({})
-local keywords = pandoc.List:new({})
+local abstract = pandoc.List()
+local thanks = pandoc.List()
+local keywords = pandoc.List()
+local reviewof = pandoc.List()
 local fields_and_aliases = {
   abstract = pandoc.List:new({'abstract', 'summary'}),
   thanks = pandoc.List:new({'thanks', 
     'acknowledgments', 'acknowledgements'}),
-  keywords = pandoc.List:new({'keywords'})
+  keywords = pandoc.List:new({'keywords'}),
+  reviewof = pandoc.List:new({'reviewof', 'review-of', 'review of'})
 }
 
 --- Extract meta from a list of blocks.
 function meta_from_blocklist (blocks)
-  local body_blocks = {}
+  local body_blocks = pandoc.List()
   -- whether the current block is part of `body`, `abstract` etc 
   local looking_at = 'body' 
 
@@ -44,7 +46,7 @@ function meta_from_blocklist (blocks)
       -- if we haven't found a metadata header, it's part of the body
       if not new_metadata_section then
         looking_at = "body"
-        body_blocks[#body_blocks + 1] = block
+        body_blocks:insert(block)
       end
     -- Horizontal Rule: if we're looking at metadata, stop
     --  otherwise keep the rule in blocks
@@ -55,20 +57,21 @@ function meta_from_blocklist (blocks)
         if not (looking_at == "body") then
           looking_at = "body"
         else
-          body_blocks[#body_blocks + 1] = block
+          body_blocks:insert(block)
         end
-    -- fake Horizontal Rule: 
     -- if looking at metadata: store it
     elseif looking_at == "abstract" then
-      abstract[#abstract + 1] = block
+      abstract:insert(block)
     elseif looking_at == "thanks" then
-      thanks[#thanks + 1] = block
+      thanks:insert(block)
+    elseif looking_at == "reviewof" then
+      reviewof:insert(block)
     elseif looking_at == "keywords" then
        if block.t == "BulletList" then
-        keywords[#keywords + 1] = block
+        keywords:insert(block)
        end
     else
-      body_blocks[#body_blocks + 1] = block
+      body_blocks:insert(block)
     end
   end
 
@@ -94,39 +97,21 @@ function bulletlist_to_metalist (keywords)
   return keyword_list
 end
 
-if PANDOC_VERSION >= {2,9,2} then
-  -- Check all block lists with pandoc 2.9.2 or later
-  return {{
-      Blocks = meta_from_blocklist,
-      Meta = function (meta)
-        if not meta.abstract and #abstract > 0 then
-          meta.abstract = pandoc.MetaBlocks(abstract)
-        end
-        if not meta.thanks and #abstract > 0 then
-          meta.thanks = pandoc.MetaBlocks(thanks)
-        end
-        if not meta.keywords and #keywords > 0 then
-          meta.keywords = bulletlist_to_metalist(keywords)
-         end
-        return meta
+return {{
+    Blocks = meta_from_blocklist,
+    Meta = function (meta)
+      if not meta.abstract and #abstract > 0 then
+        meta.abstract = pandoc.MetaBlocks(abstract)
       end
-  }}
-else
-  -- otherwise, just check the top-level block-list
-  return {{
-      Pandoc = function (doc)
-        local meta = doc.meta
-        local other_blocks = meta_from_blocklist(doc.blocks)
-        if not meta.abstract and #abstract > 0 then
-          meta.abstract = pandoc.MetaBlocks(abstract)
-        end
-        if not meta.thanks and #thanks > 0 then
-          meta.thanks = pandoc.MetaBlocks(thanks)
-        end
-        if not meta.keywords and #keywords > 0 then
-          meta.keywords = bulletlist_to_metalist(keywords)
-         end
-        return pandoc.Pandoc(other_blocks, meta)
-      end,
-  }}
-end
+      if not meta.thanks and #thanks > 0 then
+        meta.thanks = pandoc.MetaBlocks(thanks)
+      end
+      if not meta.reviewof and #reviewof > 0 then
+        meta.reviewof = pandoc.MetaBlocks(reviewof)
+      end
+      if not meta.keywords and #keywords > 0 then
+        meta.keywords = bulletlist_to_metalist(keywords)
+       end
+      return meta
+    end
+}}

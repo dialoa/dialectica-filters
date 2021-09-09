@@ -10,8 +10,8 @@ License:  MIT - see LICENSE file for details.
 Description
 ===========
 
-Pandoc markdown provides `thanks`, `abstract` and `keywords` metadata 
-fields. This filter allows you to specify them as sections in the
+Pandoc markdown provides `thanks`, `abstract`, `keywords` metadata fields. 
+This filter allows you to specify them as sections in the
 document itself. There are two reasons to do this:
 
 - if your source document is e.g. `docx`, you can enter sections that
@@ -21,6 +21,8 @@ document itself. There are two reasons to do this:
 - Entering blocks in a metadata YAML block is error-prone for users
   unfamiliar with YAML indentation rules. Allowing them to enter
   these fields in the document itself is easier.
+
+The filter also provide a `reviewof` field intended for book reviews. 
 
 Usage
 =====
@@ -45,6 +47,10 @@ This is a short and sweet article.
 
 I'm grateful to my parents and family.
 
+# Review of 
+
+[Doe]{.smallcaps}, Jane, *Last but not least*, Fancy Press, 2018, 320 pp.
+
 # Introduction
 
 The article's body starts (and ends) here.
@@ -59,8 +65,10 @@ The article's body starts (and ends) here.
 * If you don't have a heading (`# Introduction`) to separate the 
   abstract/thanks/keywords from the rest of the text, use a 
   [horizontal rule](#https://pandoc.org/MANUAL.html#horizontal-rules).
+  In markdown make sure you leave an empty line before a `---` rule, 
+  otherwise the text above is read as a heading.
   In source formats whose horizontal rules are
-  not recognized as such by Pandoc (e.g. MS Word), you can achieve the
+  not recognized as such by Pandoc (e.g. MS Word), you can still achieve the
   same effect by using an separate paragraph containing only `* * *`. 
 * The `abstract`, `keywords` and `thanks` headings can be of any level.
   They will end at the next header, so your document's headers can be 
