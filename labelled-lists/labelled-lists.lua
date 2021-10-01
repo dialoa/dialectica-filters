@@ -376,7 +376,9 @@ function read_delimiter(delim)
     delim = pandoc.utils.stringify(delim)
 
     --- process standard Pandoc attributes and their equivalent
-    if delim == 'Period' or delim == '.' then
+    if delim == '' or delim == 'None' then
+        return {'',''}
+    elseif delim == 'Period' or delim == '.' then
         return {'', '.'}
     elseif delim == 'OneParen' or delim == ')' then
         return {'', ')'}

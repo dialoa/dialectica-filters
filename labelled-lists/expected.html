@@ -254,13 +254,14 @@
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">delimiter</span><span class="kw">:</span><span class="at"> )</span></span></code></pre></div>
 <p>Possible values:</p>
 <ul>
+<li><code>''</code> or ‘None’ (empty string) for no delimiter</li>
 <li><code>()</code> or <code>(</code> or <code>TwoParens</code> for “(Label)” (default)</li>
 <li><code>.</code> or <code>Period</code> for a dot “Label.”</li>
 <li><code>)</code> or <code>OneParen</code> for “Label)”</li>
 <li><code>...%1...</code> for arbitrary delimiters, e.g. <code>|%1|</code> for “|Label|”, “%1–” for<br />
 <code>Label--</code> and so on. These characters are interpreted literally, not as markdown: <code>*%1*</code> will surround your label with asterisks, not make it italic.</li>
 </ul>
-<p>This can be set on a list basis by using a <code>delimiter</code> attribute on the first span element of your list:</p>
+<p>This can be set on a list basis by using a <code>delimiter</code> attribute on the first span element of your list (same possible values as above):</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Premise 1</span><span class="co">]</span>{delimiter=&#39;**%1**&#39;} This is the first claim.</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Premise 2</span><span class="co">]</span>{} This is the second claim.</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Conclusion</span><span class="co">]</span>{} This is the conclusion.</span></code></pre></div>

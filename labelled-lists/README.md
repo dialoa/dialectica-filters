@@ -87,6 +87,7 @@ labelled-lists:
 
 Possible values:
 
+* `''` or 'None' (empty string) for no delimiter
 * `()` or `(` or `TwoParens` for "(Label)" (default)
 * `.` or `Period` for a dot "Label."
 * `)` or `OneParen` for "Label)"
@@ -96,7 +97,7 @@ Possible values:
   it italic.
 
 This can be set on a list basis by using a `delimiter` attribute on the first
-span element of your list:
+span element of your list (same possible values as above):
 
 ```markdown
 * [Premise 1]{delimiter='**%1**'} This is the first claim.
