@@ -1,6 +1,8 @@
 ---
 title: "Labelled-lists - Custom labelled lists in Pandoc's markdown"
 author: "Julien Dutant"
+labelled-lists:
+  delimiter: )
 ---
 
 Labelled-lists
@@ -71,6 +73,41 @@ element*.
 * Span elements can also be entered using HTML syntax: `<span>inline text
   </span>`. See [Pandoc manual]
   (https://pandoc.org/MANUAL.html#divs-and-spans) for details. 
+
+### Customizing the label delimiters
+
+By default the custom lable is put between two parentheses. You can change
+this globally by setting a `delimiter` key within a `labelled-lists` key in 
+your document's metadata.
+
+```yaml
+labelled-lists:
+  delimiter: )
+```
+
+Possible values:
+
+* `()` or `(` or `TwoParens` for "(Label)" (default)
+* `.` or `Period` for a dot "Label."
+* `)` or `OneParen` for "Label)"
+* `...%1...` for arbitrary delimiters, e.g. `|%1|` for "|Label|", "%1--" for  
+  `Label--` and so on. These characters are interpreted literally, not 
+  as markdown: `*%1*` will surround your label with asterisks, not make
+  it italic.
+
+This can be set on a list basis by using a `delimiter` attribute on the first
+span element of your list:
+
+```markdown
+* [Premise 1]{delimiter='**%1**'} This is the first claim.
+* [Premise 2]{} This is the second claim.
+* [Conclusion]{} This is the conclusion.
+```
+
+* [Premise 1]{delimiter='**%1**'} This is the first claim.
+* [Premise 2]{} This is the second claim.
+* [Conclusion]{} This is the conclusion.
+
 
 ### Cross-referencing custom-label items
 

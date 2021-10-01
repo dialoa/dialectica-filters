@@ -14,7 +14,8 @@
 -- @citation_syntax boolean whether to use pandoc-crossref cite syntax
 local options = {
     set_header_includes = true,
-    citation_syntax = true
+    citation_syntax = true,
+    delimiter = {'(',')'},
 }
 
 -- target_formats  filter is triggered when those formats are targeted
@@ -178,10 +179,14 @@ end
 -- style_label: style the label
 -- returns a styled label. Default: round brackets
 -- @param label Inlines an item's label as list of inlines
-function style_label(label)
+-- @param delim (optional) a pair of delimiters (list of two strings)
+function style_label(label, delim)
+    if not delim then
+        delim = options.delimiter
+    end
     styled_label = label:clone()
-    styled_label:insert(1, pandoc.Str('('))
-    styled_label:insert(pandoc.Str(')'))
+    styled_label:insert(1, pandoc.Str(delim[1]))
+    styled_label:insert(pandoc.Str(delim[2]))
     return styled_label
 end
 
@@ -205,6 +210,15 @@ function build_list(element)
             ))
     end
 
+    -- does the first span have a delimiter attribute?
+    -- element.c[1] is the first item in the list, type blocks
+    -- .. [1].c is the first block's content, type inlines
+    -- .. [1] the first inline in that block, our span
+    local span = element.c[1][1].c[1]
+    local delim = nil
+    if span.attributes and span.attributes.delimiter then
+        delim = read_delimiter(span.attributes.delimiter)
+    end
 
     -- process each item
 
@@ -231,7 +245,7 @@ function build_list(element)
 
             local inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
-            inlines:extend(style_label(label))
+            inlines:extend(style_label(label, delim))
             if not(id == '') then 
                 inlines:insert(pandoc.RawInline('latex',
                     '\\labelledlistlabel{' .. id .. '}{'))
@@ -254,7 +268,7 @@ function build_list(element)
 
         elseif FORMAT:match('html') then
 
-            local label_span = pandoc.Span(style_label(label))
+            local label_span = pandoc.Span(style_label(label, delim))
             label_span.classes = { html_classes['label'] }
             if id then label_span.identifier = id end
 
@@ -327,7 +341,7 @@ end
 --- Write meta: add header-includes to the document's metadata.
 -- @param meta pandoc Meta block
 -- @return processed block
-local function write_meta(meta)
+function write_meta(meta)
 
     if options.set_header_includes and header_code[FORMAT] then
 
@@ -355,6 +369,27 @@ local function write_meta(meta)
 
 end
 
+--- read_delimiter: process a delimiter option
+-- @delim: string, e.g. `Parens` or `[%1]`
+-- @return: a pair of delimiter strings
+function read_delimiter(delim) 
+    delim = pandoc.utils.stringify(delim)
+
+    --- process standard Pandoc attributes and their equivalent
+    if delim == 'Period' or delim == '.' then
+        return {'', '.'}
+    elseif delim == 'OneParen' or delim == ')' then
+        return {'', ')'}
+    elseif delim == 'TwoParens' or delim == '(' or delim == '()' then
+        return {'(',')'}
+    --- if it contains '%1' assume it's a substitution string for gmatch
+    -- the left delimiter is before '%1' and the right after
+    elseif string.find(delim, '%%1') then
+        return {delim:match('^(*.)%%1') or '', 
+                delim:match('%%1(*.)$') or ''}
+    end
+
+end
 
 --- Read options from metadata block.
 --  Get options from the `statement` field in a metadata block.
@@ -362,7 +397,7 @@ end
 -- @param meta the document's metadata block.
 -- @return nothing, values set in the `options` map.
 -- @see options
-local function get_options(meta)
+function get_options(meta)
   if meta['labelled-lists'] then
 
     -- set-header-includes: boolean
@@ -372,6 +407,14 @@ local function get_options(meta)
       else
         options.set_header_includes = false
       end
+    end
+
+    -- default-delimiter: string
+    if meta['labelled-lists'].delimiter and 
+            meta['labelled-lists'].delimiter.t == 'MetaInlines' then
+        local delim = read_delimiter(pandoc.utils.stringify(
+                        meta['labelled-lists'].delimiter))
+        if delim then options.delimiter = delim end
     end
 
   end

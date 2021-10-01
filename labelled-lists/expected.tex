@@ -4,10 +4,6 @@
 %
 \documentclass[
 ]{article}
-\title{Labelled-lists - Custom labelled lists in Pandoc's markdown}
-\author{Julien Dutant}
-\date{}
-
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
 \usepackage{iftex}
@@ -99,6 +95,10 @@
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
+\title{Labelled-lists - Custom labelled lists in Pandoc's markdown}
+\author{Julien Dutant}
+\date{}
+
 \begin{document}
 \maketitle
 
@@ -153,11 +153,11 @@ see the result):
 \begin{itemize}
 \tightlist
 
-\item[(Premise 1)] This is the first claim.
+\item[Premise 1)] This is the first claim.
 
-\item[(Premise 2)] This is the second claim.
+\item[Premise 2)] This is the second claim.
 
-\item[(Conclusion)] This is the conclusion.
+\item[Conclusion)] This is the conclusion.
 
 \end{itemize}
 
@@ -191,6 +191,63 @@ provided that \emph{every item starts with a non-empty Span element}.
   \texttt{\textless{}span\textgreater{}inline\ text\ \ \ \textless{}/span\textgreater{}}.
   See {[}Pandoc manual{]}
   (https://pandoc.org/MANUAL.html\#divs-and-spans) for details.
+\end{itemize}
+
+\hypertarget{customizing-the-label-delimiters}{%
+\subsubsection{Customizing the label
+delimiters}\label{customizing-the-label-delimiters}}
+
+By default the custom lable is put between two parentheses. You can
+change this globally by setting a \texttt{delimiter} key within a
+\texttt{labelled-lists} key in your document's metadata.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{labelled{-}lists}\KeywordTok{:}
+\AttributeTok{  }\FunctionTok{delimiter}\KeywordTok{:}\AttributeTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+Possible values:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{()} or \texttt{(} or \texttt{TwoParens} for ``(Label)''
+  (default)
+\item
+  \texttt{.} or \texttt{Period} for a dot ``Label.''
+\item
+  \texttt{)} or \texttt{OneParen} for ``Label)''
+\item
+  \texttt{...\%1...} for arbitrary delimiters,
+  e.g.~\texttt{\textbar{}\%1\textbar{}} for
+  ``\textbar Label\textbar{}'', ``\%1--'' for\\
+  \texttt{Label-\/-} and so on. These characters are interpreted
+  literally, not as markdown: \texttt{*\%1*} will surround your label
+  with asterisks, not make it italic.
+\end{itemize}
+
+This can be set on a list basis by using a \texttt{delimiter} attribute
+on the first span element of your list:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Premise 1}\CommentTok{]}\NormalTok{\{delimiter=\textquotesingle{}**\%1**\textquotesingle{}\} This is the first claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Premise 2}\CommentTok{]}\NormalTok{\{\} This is the second claim.}
+\SpecialStringTok{* }\CommentTok{[}\OtherTok{Conclusion}\CommentTok{]}\NormalTok{\{\} This is the conclusion.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+
+\item[**Premise 1**] This is the first claim.
+
+\item[**Premise 2**] This is the second claim.
+
+\item[**Conclusion**] This is the conclusion.
+
 \end{itemize}
 
 \hypertarget{cross-referencing-custom-label-items}{%
@@ -339,9 +396,9 @@ options as a map. Presently the filter has just one option:
 \begin{itemize}
 \tightlist
 
-\item[(\(p_1\))] This list uses
+\item[\(p_1\))] This list uses
 
-\item[(\(p_2\))] math formulas as labels.
+\item[\(p_2\))] math formulas as labels.
 
 \end{itemize}
 
@@ -364,9 +421,9 @@ Ignored: these are not treated as labels.
 \begin{itemize}
 \tightlist
 
-\item[(\textsc{All})] This list uses
+\item[\textsc{All})] This list uses
 
-\item[(\textsc{Some})] latex code as labels.
+\item[\textsc{Some})] latex code as labels.
 
 \end{itemize}
 
@@ -376,9 +433,9 @@ Ignored: these are not treated as labels.
 \begin{itemize}
 \tightlist
 
-\item[(A1)] \[F(x) > G(x)\]
+\item[A1)] \[F(x) > G(x)\]
 
-\item[(A2)] \[G(x) > H(x)\]
+\item[A2)] \[G(x) > H(x)\]
 
 \end{itemize}
 
@@ -389,13 +446,13 @@ blocks}\label{items-with-several-blocks}}
 \begin{itemize}
 \tightlist
 
-\item[(\textbf{B1})] This list's items
+\item[\textbf{B1})] This list's items
 
 consist of several blocks
 
 \[\sum_i Fi > \sum_i Gi\]
 
-\item[(\textbf{B2})] Lorem ipsum dolor sit amet, consectetur adipiscing
+\item[\textbf{B2})] Lorem ipsum dolor sit amet, consectetur adipiscing
 elit. Donec et massa ut eros volutpat gravida ut vel lacus. Proin turpis
 eros, imperdiet sed quam eget, bibendum aliquam massa. Phasellus
 pellentesque egestas dapibus. Proin porta tellus id orci consectetur
@@ -420,12 +477,12 @@ syntax}\label{cross-reference-with-citation-syntax}}
 \begin{itemize}
 \tightlist
 
-\item[(\textbf{B1})\labelledlistlabel{B1ref}{\textbf{B1}}] This is the
+\item[\textbf{B1})\labelledlistlabel{B1ref}{\textbf{B1}}] This is the
 first claim.
 
-\item[(B2)\labelledlistlabel{B2ref}{B2}] This is the second claim.
+\item[B2)\labelledlistlabel{B2ref}{B2}] This is the second claim.
 
-\item[(\emph{D})\labelledlistlabel{Dref}{\emph{D}}] This is the
+\item[\emph{D})\labelledlistlabel{Dref}{\emph{D}}] This is the
 conclusion.
 
 \end{itemize}
@@ -440,12 +497,12 @@ syntax}\label{cross-reference-with-internal-link-syntax}}
 \begin{itemize}
 \tightlist
 
-\item[(\textbf{A1})\labelledlistlabel{A1ref}{\textbf{A1}}] This is the
+\item[\textbf{A1})\labelledlistlabel{A1ref}{\textbf{A1}}] This is the
 first claim.
 
-\item[(A2)\labelledlistlabel{A2ref}{A2}] This is the second claim.
+\item[A2)\labelledlistlabel{A2ref}{A2}] This is the second claim.
 
-\item[(\emph{C})\labelledlistlabel{Cref}{\emph{C}}] This is the
+\item[\emph{C})\labelledlistlabel{Cref}{\emph{C}}] This is the
 conclusion.
 
 \end{itemize}

@@ -22,7 +22,7 @@
       padding-top: 50px;
       padding-bottom: 50px;
       hyphens: auto;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
       text-rendering: optimizeLegibility;
       font-kerning: normal;
     }
@@ -93,6 +93,7 @@
     pre code {
       padding: 0;
       overflow: visible;
+      overflow-wrap: normal;
     }
     .sourceCode {
      background-color: transparent;
@@ -235,9 +236,9 @@
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Conclusion</span><span class="co">]</span>{} This is the conclusion.</span></code></pre></div>
 <p>This generates the following list (process this file with the filter to see the result):</p>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 1)</span> This is the first claim.</p>
-<p class="labelled-lists-item"><span class="labelled-lists-label">(Premise 2)</span> This is the second claim.</p>
-<p class="labelled-lists-item"><span class="labelled-lists-label">(Conclusion)</span> This is the conclusion.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">Premise 1)</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">Premise 2)</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">Conclusion)</span> This is the conclusion.</p>
 </div>
 <p>In general, the filter will turn a bullet list into a custom label list provided that <em>every item starts with a non-empty Span element</em>.</p>
 <ul>
@@ -247,11 +248,32 @@
 <li>For the purposes of this filter, a Span is <em>non-empty</em> if its inline text is not empty. Thus <code>[]{}</code> will not work. Numbers or other unicode characters work. To generate an empty label, use a space or other invisible character, e.g. <code>[ ]   {}</code>. <em>Exception</em>: math formulas will work as labels, but if the inline text only contains LaTeX code (<code>\textsc{a}</code>) it will be treated as empty.</li>
 <li>Span elements can also be entered using HTML syntax: <code>&lt;span&gt;inline text   &lt;/span&gt;</code>. See [Pandoc manual] (https://pandoc.org/MANUAL.html#divs-and-spans) for details.</li>
 </ul>
+<h3 id="customizing-the-label-delimiters">Customizing the label delimiters</h3>
+<p>By default the custom lable is put between two parentheses. You can change this globally by setting a <code>delimiter</code> key within a <code>labelled-lists</code> key in your document’s metadata.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">labelled-lists</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">delimiter</span><span class="kw">:</span><span class="at"> )</span></span></code></pre></div>
+<p>Possible values:</p>
+<ul>
+<li><code>()</code> or <code>(</code> or <code>TwoParens</code> for “(Label)” (default)</li>
+<li><code>.</code> or <code>Period</code> for a dot “Label.”</li>
+<li><code>)</code> or <code>OneParen</code> for “Label)”</li>
+<li><code>...%1...</code> for arbitrary delimiters, e.g. <code>|%1|</code> for “|Label|”, “%1–” for<br />
+<code>Label--</code> and so on. These characters are interpreted literally, not as markdown: <code>*%1*</code> will surround your label with asterisks, not make it italic.</li>
+</ul>
+<p>This can be set on a list basis by using a <code>delimiter</code> attribute on the first span element of your list:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Premise 1</span><span class="co">]</span>{delimiter=&#39;**%1**&#39;} This is the first claim.</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Premise 2</span><span class="co">]</span>{} This is the second claim.</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">Conclusion</span><span class="co">]</span>{} This is the conclusion.</span></code></pre></div>
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span class="labelled-lists-label">**Premise 1**</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">**Premise 2**</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">**Conclusion**</span> This is the conclusion.</p>
+</div>
 <h3 id="cross-referencing-custom-label-items">Cross-referencing custom-label items</h3>
 <p>Custom labels can be given internal identifiers. The syntax is <code>[label]{#identifier}</code>. In the list below, <code>A1ref</code>, <code>A2ref</code> and <code>Cref</code> identify the item:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">**A1**</span><span class="co">]</span>{#A1ref} This is the first claim.</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">A2</span><span class="co">]</span>{#A2ref} This is the second claim.</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">*C*</span><span class="co">]</span>{#Cref} This is the conclusion.</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">**A1**</span><span class="co">]</span>{#A1ref} This is the first claim.</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">A2</span><span class="co">]</span>{#A2ref} This is the second claim.</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span><span class="co">[</span><span class="ot">*C*</span><span class="co">]</span>{#Cref} This is the conclusion.</span></code></pre></div>
 <p>Note that <code>#</code> is not part of the identifier. Identifiers should start with a letter and contain only letters, digits, colons <code>:</code>, dots <code>.</code>, dashes <code>-</code> and underscores <code>_</code>.</p>
 <p>Labels with identifiers can be crossreferenced using Pandoc’s citations or internal links.</p>
 <h4 id="cross-referencing-with-citations">Cross-referencing with citations</h4>
@@ -270,8 +292,8 @@
 <p>Alternatively, the citation syntax for crossreferencing custom label items can be deactivated. See <a href="#customization">Customization</a> below.</p>
 <h4 id="cross-referencing-with-internal-links">Cross-referencing with internal links</h4>
 <p>In Pandoc markdown internal links are created with the syntax <code>[link  text](#target_identifier)</code>. (Note the rounded brackets instead of curly ones for Span element identifiers.) You can use internal links to cross-refer to custom label items that have a identifier. If your link has no text, the label with its formatting will be printed out; otherwise whichever text you give for the link. For instance, given the custom label list above, the following:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>The claim [](#A1ref) together with <span class="co">[</span><span class="ot">the next claim</span><span class="co">](#A2ref)</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>entail ([](#Cref)).</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>The claim [](#A1ref) together with <span class="co">[</span><span class="ot">the next claim</span><span class="co">](#A2ref)</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>entail ([](#Cref)).</span></code></pre></div>
 <p>will output:</p>
 <blockquote>
 <p>The claim <a href=""><strong>A1</strong></a> together with <a href="">the next claim</a> entail (<a href=""><em>C</em></a>).</p>
@@ -279,12 +301,12 @@
 <p>where the links point to the corresponding items in the list.</p>
 <h3 id="customization">Customization</h3>
 <p>Filter options can be specified in the document’s metadata (YAML block) as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> My document</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> John Doe</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">labelled-lists:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">  set-header-includes: false</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">  citation-syntax: false</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> My document</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> John Doe</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">labelled-lists:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">  set-header-includes: false</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">  citation-syntax: false</span></span></code></pre></div>
 <p>That is the metadata field <code>labelled-lists</code> contains the filter options as a map. Presently the filter has just one option:</p>
 <ul>
 <li><code>set-header-includes</code>: if true, the filter supplements the document’s meta-data with header-include code needed to style custom label lists in the output. Set to <code>false</code> or <code>no</code> if you would rather provide this code yourself in a CSS file or custom Pandoc template. (default true)</li>
@@ -293,8 +315,8 @@
 <h2 id="examples-and-tests">Examples and tests</h2>
 <h3 id="math-formulas">math formulas</h3>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="math inline"><em>p</em><sub>1</sub></span>)</span> This list uses</p>
-<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="math inline"><em>p</em><sub>2</sub></span>)</span> math formulas as labels.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label"><span class="math inline"><em>p</em><sub>1</sub></span>)</span> This list uses</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label"><span class="math inline"><em>p</em><sub>2</sub></span>)</span> math formulas as labels.</p>
 </div>
 <h3 id="latex-code">LaTeX code</h3>
 <ul>
@@ -304,62 +326,62 @@
 <p>Ignored: these are not treated as labels.</p>
 <h3 id="small-caps">Small caps</h3>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="smallcaps">All</span>)</span> This list uses</p>
-<p class="labelled-lists-item"><span class="labelled-lists-label">(<span class="smallcaps">Some</span>)</span> latex code as labels.</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label"><span class="smallcaps">All</span>)</span> This list uses</p>
+<p class="labelled-lists-item"><span class="labelled-lists-label"><span class="smallcaps">Some</span>)</span> latex code as labels.</p>
 </div>
 <h3 id="list-with-para-items">List with Para items</h3>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span class="labelled-lists-label">(A1)</span> <span class="math display"><em>F</em>(<em>x</em>) &gt; <em>G</em>(<em>x</em>)</span></p>
-<p class="labelled-lists-item"><span class="labelled-lists-label">(A2)</span> <span class="math display"><em>G</em>(<em>x</em>) &gt; <em>H</em>(<em>x</em>)</span></p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">A1)</span> <span class="math display"><em>F</em>(<em>x</em>) &gt; <em>G</em>(<em>x</em>)</span></p>
+<p class="labelled-lists-item"><span class="labelled-lists-label">A2)</span> <span class="math display"><em>G</em>(<em>x</em>) &gt; <em>H</em>(<em>x</em>)</span></p>
 </div>
 <h3 id="items-with-several-blocks">items with several blocks</h3>
 <div class="labelled-lists-list">
 <div class="labelled-lists-item">
-<p><span class="labelled-lists-label">(<strong>B1</strong>)</span> This list’s items</p>
+<p><span class="labelled-lists-label"><strong>B1</strong>)</span> This list’s items</p>
 <p>consist of several blocks</p>
 <p><span class="math display">∑<sub><em>i</em></sub><em>F</em><em>i</em> &gt; ∑<sub><em>i</em></sub><em>G</em><em>i</em></span></p>
 </div>
 <div class="labelled-lists-item">
-<p><span class="labelled-lists-label">(<strong>B2</strong>)</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et massa ut eros volutpat gravida ut vel lacus. Proin turpis eros, imperdiet sed quam eget, bibendum aliquam massa. Phasellus pellentesque egestas dapibus. Proin porta tellus id orci consectetur bibendum. Nam eu cursus quam. Etiam vehicula in mi sed interdum. Duis rutrum eleifend consectetur. Phasellus ullamcorper, urna at vestibulum venenatis, tellus erat luctus nibh, eget hendrerit justo enim nec magna. Duis mollis ac felis ac tristique.</p>
+<p><span class="labelled-lists-label"><strong>B2</strong>)</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et massa ut eros volutpat gravida ut vel lacus. Proin turpis eros, imperdiet sed quam eget, bibendum aliquam massa. Phasellus pellentesque egestas dapibus. Proin porta tellus id orci consectetur bibendum. Nam eu cursus quam. Etiam vehicula in mi sed interdum. Duis rutrum eleifend consectetur. Phasellus ullamcorper, urna at vestibulum venenatis, tellus erat luctus nibh, eget hendrerit justo enim nec magna. Duis mollis ac felis ac tristique.</p>
 <p>Pellentesque malesuada arcu ac orci scelerisque vulputate. Aenean at ex suscipit, ultricies tellus sit amet, luctus lectus. Duis ut viverra sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor. In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.</p>
 </div>
 </div>
 <h3 id="cross-reference-with-citation-syntax">cross-reference with citation syntax</h3>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span id="B1ref" class="labelled-lists-label">(<strong>B1</strong>)</span> This is the first claim.</p>
-<p class="labelled-lists-item"><span id="B2ref" class="labelled-lists-label">(B2)</span> This is the second claim.</p>
-<p class="labelled-lists-item"><span id="Dref" class="labelled-lists-label">(<em>D</em>)</span> This is the conclusion.</p>
+<p class="labelled-lists-item"><span id="B1ref" class="labelled-lists-label"><strong>B1</strong>)</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span id="B2ref" class="labelled-lists-label">B2)</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span id="Dref" class="labelled-lists-label"><em>D</em>)</span> This is the conclusion.</p>
 </div>
 <p>The claim <a href="#B1ref"><strong>B1</strong></a> together with the claim <a href="#B2ref">B2</a> entail (<a href="#Dref"><em>D</em></a>).</p>
 <h3 id="cross-reference-with-internal-link-syntax">cross-reference with internal link syntax</h3>
 <div class="labelled-lists-list">
-<p class="labelled-lists-item"><span id="A1ref" class="labelled-lists-label">(<strong>A1</strong>)</span> This is the first claim.</p>
-<p class="labelled-lists-item"><span id="A2ref" class="labelled-lists-label">(A2)</span> This is the second claim.</p>
-<p class="labelled-lists-item"><span id="Cref" class="labelled-lists-label">(<em>C</em>)</span> This is the conclusion.</p>
+<p class="labelled-lists-item"><span id="A1ref" class="labelled-lists-label"><strong>A1</strong>)</span> This is the first claim.</p>
+<p class="labelled-lists-item"><span id="A2ref" class="labelled-lists-label">A2)</span> This is the second claim.</p>
+<p class="labelled-lists-item"><span id="Cref" class="labelled-lists-label"><em>C</em>)</span> This is the conclusion.</p>
 </div>
 <p>The claim <a href="#A1ref"><strong>A1</strong></a> together with the claim <a href="#A2ref">A2</a> entail (<a href="#Cref"><em>C</em></a>).</p>
 <h2 id="details">Details</h2>
 <h3 id="latex-output">LaTeX output</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">itemize</span>}</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\tightlist</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 1)] This is the first claim.</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 2)] This is the second claim.</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Conclusion)] This is the conclusion.</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">\end</span>{<span class="ex">itemize</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">itemize</span>}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\tightlist</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 1)] This is the first claim.</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Premise 2)] This is the second claim.</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">\item</span>[(Conclusion)] This is the conclusion.</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">\end</span>{<span class="ex">itemize</span>}</span></code></pre></div>
 <h3 id="html-output">HTML output</h3>
 <p>HTML output is a <code>&lt;div&gt;</code>. Each item is a <code>&lt;p&gt;</code> if it’s one block long, a <code>&lt;div&gt;</code> if longer. The label itself is contained in a <code>&lt;span&gt;</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-list&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 1)<span class="kw">&lt;/span&gt;</span> This is the first claim.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 2)<span class="kw">&lt;/span&gt;</span> This is the second claim.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(<span class="kw">&lt;strong&gt;</span>Conclusion<span class="kw">&lt;/strong&gt;</span>)<span class="kw">&lt;/span&gt;</span> This third item consists of<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;</span>two blocks.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/div&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-list&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 1)<span class="kw">&lt;/span&gt;</span> This is the first claim.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(Premise 2)<span class="kw">&lt;/span&gt;</span> This is the second claim.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-item&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;labelled-lists-label&quot;</span><span class="kw">&gt;</span>(<span class="kw">&lt;strong&gt;</span>Conclusion<span class="kw">&lt;/strong&gt;</span>)<span class="kw">&lt;/span&gt;</span> This third item consists of<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;p&gt;</span>two blocks.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 <h3 id="list-structures">List structures</h3>
 <ul>
 <li>In the Pandoc AST, each item is a list of blocks. If the item has only one block, the list will contain only one element.</li>
