@@ -122,6 +122,9 @@ first-line-indent:
     - HorizontalRule
     - OrderedList
   dont-remove-after: Table
+  remove-after-class: 
+    - statement
+  dont-remove-after-class: 
 ```
 
 And as follows in a default file:
@@ -141,6 +144,9 @@ metadata:
       - HorizontalRule
       - OrderedList
     dont-remove-after: Table
+    remove-after-class: 
+      - statement
+    dont-remove-after-class: 
 ```
 
 The options are described below.
@@ -158,16 +164,21 @@ The options are described below.
 * `set-header-includes`: whether the filter should add formatting code
   to the document's `header-includes` metadata field. Set it to false if
   you use a custom template instead.
-* `remove-after`, `dont-remove-after`: use these options to customize
-  the automatic removal of first-line indent on paragraphs following
-  blocks of a certain type. These options can be a single string or
-  an list of strings. The strings are case-sensitive and should be
-  those corresponding to [block types in Lua
-  filters](https://pandoc.org/lua-filters.html#type-block): BlockQuote,
-  BulletList, CodeBlock, DefinitionList, Div, Header, HorizontalRule,
-  LineBlock, Null, OrderedList, Para, Plain, RawBlock, Table.
+* `remove-after`, `dont-remove-after`: decide whether to remove 
+  first-line-indent automatically after blocks of a certain type. 
+  These options can be a single string or a list of strings. 
+  The strings are case-sensitive and should correspond to [block types 
+  in Lua filters](https://pandoc.org/lua-filters.html#type-block): 
+  BlockQuote, BulletList, CodeBlock, DefinitionList, Div, Header, HorizontalRule, LineBlock, Null, OrderedList, Para, Plain, RawBlock, Table.
+  Inactive is `auto-remove` is false.
+* `remove-after-class`, `dont-remove-after-class`: decide whether to remove 
+  first-line-indent automatically after elements of certain classes. For
+  instance, you can decide that elements with class "endsparagraph" should
+  not be followed by first-line-indent. Useful for Div elements, if you use
+  Divs of certain classes to typeset material that doesn't end a paragraph.
+  Inactive is `auto-remove` is false.
 
-To illustrate the last option, suppose you don't want to filter to remove
+To illustrate, suppose you don't want to filter to remove
 first-line indent after definition lists. You can add the following
 lines in the document's metadata block (if the source is markdown):
 

@@ -11,6 +11,8 @@ first-line-indent:
     - DefinitionList
     - OrderedList
   size: "2em"
+  remove-after-class: chuckit
+  dont-remove-after-class: keepit
 ---
 
 First paragraph. In English-style typography, the first paragraph shouldn't have a first-line indent, nor the paragraphs below headers.
@@ -25,8 +27,8 @@ The quote below ends a paragraph:
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
-\indent This paragraph, then, is genuinely a new paragraph and starts with
-a first-line indent.
+\indent This paragraph below, then, is properly a new paragraph and starts with
+a first-line indent which we have to manually specify with `\indent`. 
 
 # Further tests
 
@@ -54,6 +56,21 @@ local variable = "value"
 Or horizontal rules.
 
 ---
+
+We can check that default behaviour is overridden for elements
+of certain classes, adding indent:
+
+``` {.markdown .keepit}
+This code block should be followed by an indented paragraph.
+```
+
+Or removing it:
+
+::: chuckit
+This Div should be followed by a paragraph without indent.
+:::
+
+as desired. 
 
 In this document we added a few custom filter options. The size of first-line
 indents is 2em instead of the standard 1em. We also added an option to remove indent after tables:

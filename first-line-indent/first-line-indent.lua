@@ -16,15 +16,20 @@
 --    header-includes to handle first-line indent paragraph style.
 -- @param auto_remove_indents boolean whether to automatically remove
 --    indents after blockquotes and the like.
--- @param remove_indent_after list of strings, Pandoc AST block types
+-- @param remove_after list of strings, Pandoc AST block types
 --    after which first-line indents should be automatically removed.
+-- @param remove_after_class list of strings, classes of elements
+--    after which first-line indents should be automatically removed.
+-- @param dont_remove_after_class list of strings, classes of elements
+--    after which first-line indents should not be removed. Prevails
+--    over remove_after.
 -- @param size string a CSS / LaTeX specification of the first line
 --    indent length
 local options = {
   set_metadata_variable = true,
   set_header_includes = true,
   auto_remove = true,
-  remove_indent_after = pandoc.List({
+  remove_after = pandoc.List({
     'BlockQuote',
     'BulletList',
     'CodeBlock',
@@ -32,8 +37,16 @@ local options = {
     'HorizontalRule',
     'OrderedList',
   }),
+  remove_after_class = pandoc.List({
+    'statement',
+  }),
+  dont_remove_after_class = pandoc.List:new(),
   size = "1em",
 }
+-- List of pandoc AST block elements that have classes
+local types_with_classes = pandoc.List({
+  'CodeBlock', 'Div', 'Header', 'Table', 
+})
 
 -- # Filter global variables
 -- @utils pandoc's module of utilities functions
@@ -75,7 +88,8 @@ local header_code = {
 ]],
 }
 
---- Add a block to the document's header-includes meta-data field.
+--- add_header_includes: add a block to the document's header-includes 
+-- meta-data field.
 -- @param meta the document's metadata block
 -- @param blocks list of Pandoc block elements (e.g. RawBlock or Para)
 --    to be added to the header-includes of meta
@@ -97,6 +111,23 @@ local function add_header_includes(meta, blocks)
   meta['header-includes'] = header_includes
 
   return meta
+
+end
+
+--- classes_include: check if one of an element's class is in a given
+-- list. Returns true if match, nil if no match or the element doesn't 
+-- have classes.
+-- @param elem pandoc AST element
+-- @param classes pandoc List of strings
+local function classes_include(elem,classes)
+
+  if elem.classes then 
+
+    for _,class in ipairs(elem.classes) do
+      if classes:includes(class) then return true end
+    end
+
+  end
 
 end
 
@@ -130,64 +161,70 @@ function process_metadata(meta)
       options.auto_remove = false
     end
 
-    if (user_options['remove-after']) then
+    -- (dont-)remove-after, (dont-)remove-after-class accept only 
+    -- MetaInlines and MetaList, we standardize to the latter
+    for _,key in ipairs({'remove-after','dont-remove-after',
+                  'remove-after-class','dont-remove-after-class'}) do
+      if user_options[key] and user_options[key].t == 'MetaInlines' then
+        user_options[key] = pandoc.MetaList({user_options[key]})
+      end
+    end
 
-      if user_options['remove-after'].t == 'MetaInlines' or
-        user_options['remove-after'].t == 'MetaList' then
+    -- for object types we only need to customize one list, remove_after
+    -- for classes we need a whitelist (remove_after_class) and a
+    -- blacklist (dont_remove_after_class). 
+    -- We first insert user entries in remove_after, remove_after_class
+    -- and dont_remove_after_class.
+    for optname, metakey in pairs({
+        remove_after = 'remove-after',
+        remove_after_class = 'remove-after-class',
+        dont_remove_after_class = 'dont-remove-after-class',
+      }) do
 
-          if user_options['remove-after'].t == 'MetaInlines' then
+      if user_options[metakey] 
+        and user_options[metakey].t == 'MetaList' then
 
-            options.remove_indent_after:insert (
-              utils.stringify(user_options['remove-after']))
+          for _,item in ipairs(user_options[metakey]) do
 
-          else
-
-            for _,item in ipairs(user_options['remove-after']) do
-
-              options.remove_indent_after:insert(utils.stringify(item))
-
-            end
+            options[optname]:insert(utils.stringify(item))
 
           end
 
       end
+
     end
 
-    if (user_options['dont-remove-after']) then
+    -- We then remove user entries from remove_after and remove_after_class
+    for optname, metakey in pairs({
+        remove_after = 'dont-remove-after',
+        remove_after_class = 'dont-remove-after-class'
+      }) do
 
-      if user_options['dont-remove-after'].t == 'MetaInlines' or
-        user_options['dont-remove-after'].t == 'MetaList' then
+      if user_options[metakey] 
+        and user_options[metakey].t == 'MetaList' then
 
-          -- list of strings to be removed
-          local blacklist = pandoc.List({})
+        -- list of strings to be removed
+        local blacklist = pandoc.List:new()
 
-          if user_options['dont-remove-after'].t == 'MetaInlines' then
+        for _,item in ipairs(user_options[metakey]) do
 
-            blacklist:insert (
-              utils.stringify(user_options['dont-remove-after']))
+          blacklist:insert(utils.stringify(item))
 
-          else
+        end
 
-            for _,item in ipairs(user_options['dont-remove-after']) do
-
-              blacklist:insert(utils.stringify(item))
-
-            end
-
+        -- filter to that returns true iff an item isn't blacklisted
+        predicate = function (str)
+            return not(blacklist:includes(str))
           end
 
-          -- filter the options.remove_indent_after list to only
-          -- include items that are not blacklisted
-          predicate = function (str)
-              return not(blacklist:includes(str))
-            end
-
-          options.remove_indent_after =
-            options.remove_indent_after:filter(predicate)
+        options[optname] =
+          options[optname]:filter(predicate)
 
       end
+
     end
 
+   -- sil
    if not(user_options['size'] == nil) then
 
       -- @todo using stringify means that LaTeX commands in
@@ -286,9 +323,12 @@ local function process_body(doc)
 
   for _,elem in pairs(doc.blocks) do
 
+    -- Paragraphs may already have explicit indentation marking
+    -- in LaTeX. If so we reproduce it in the relevant output
+    -- format. Otherwise we remove the first-line indent if 
+    -- needed, provided auto_remove is on.
     if elem.t == "Para" then
 
-      -- if explicit indentation marking, leave as is and style output
       if elem.content[1] and (utils.equals(elem.content[1],
         code.latex.indent) or utils.equals(elem.content[1],
         code.latex.noindent)) then
@@ -299,8 +339,7 @@ local function process_body(doc)
           result:extend(indent_markup('noindent', elem))
         end
 
-      -- if auto_remove is on remove the first-line indent if needed
-      elseif options.auto_remove and do_not_indent_next_block then
+      elseif do_not_indent_next_block and options.auto_remove then
 
         result:extend(indent_markup('noindent', elem))
 
@@ -312,11 +351,21 @@ local function process_body(doc)
 
       do_not_indent_next_block = false
 
-    elseif options.remove_indent_after:includes(elem.t) then
+    -- if not paragraph, we check if it is an element after which
+    -- first-line should be removed because of its type or class
+    elseif options.remove_after:includes(elem.t) and 
+       not classes_include(elem, options.dont_remove_after_class) then
+ 
+      do_not_indent_next_block = true
+      result:insert(elem)
+
+    elseif types_with_classes:includes(elem.t) and 
+      classes_include(elem, options.remove_after_class) then
 
       do_not_indent_next_block = true
       result:insert(elem)
 
+    -- otherwise we don't remove indent after this block
     else
 
       do_not_indent_next_block = false

@@ -2,7 +2,7 @@ DIFF ?= diff --strip-trailing-cr -u
 
 .PHONY: test
 
-test: sample.md expected.html \
+test: sample.md expected.html expected.tex \
 	sample_head-inc_1.md expected_hi_1.html expected_hi_1.tex \
 	sample_head-inc_2.md expected_hi_2.html expected_hi_2.tex \
 	sample_head-inc_3.md expected_hi_3.html expected_hi_3.tex \
