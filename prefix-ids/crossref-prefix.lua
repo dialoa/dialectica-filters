@@ -153,11 +153,20 @@ function process_doc(doc)
     -- prefix identifiers in doc and in metadata fields with blocks content
     -- NB: we can't use element.t if the value is a boolean
     for key,val in pairs(doc.meta) do
-        if not (val == true or val == false or val == nil) 
-           and val.t == 'MetaBlocks' then
+        if not (val == true or val == false or val == nil) then
+            if val.t == 'MetaBlocks' then
               doc.meta[key] = pandoc.MetaBlocks(
                             process_identifiers(pandoc.List(val))
                         )
+            elseif val.t == 'MetaList' then
+                for i = 1, #val do
+                    if val[i].t == 'MetaBlocks' then
+                        doc.meta[key][i] = pandoc.MetaBlocks(
+                            process_identifiers(pandoc.List(val[i]))
+                        )
+                    end
+                end
+            end
         end
     end
     doc.blocks = process_identifiers(doc.blocks)
@@ -203,14 +212,23 @@ function process_doc(doc)
         return div.content
     end
 
-    -- process links and cites in doc and in metablocks fields
+     -- process links and cites in doc and in metablocks fields
     -- NB: we can't use element.t if the value is a boolean
     for key,val in pairs(doc.meta) do
-        if not (val == true or val == false or val == nil) 
-           and val.t == 'MetaBlocks' then
+        if not (val == true or val == false or val == nil) then
+            if val.t == 'MetaBlocks' then
               doc.meta[key] = pandoc.MetaBlocks(
                             process_links(pandoc.List(val))
                         )
+            elseif val.t == 'MetaList' then
+                for i = 1, #val do
+                    if val[i].t == 'MetaBlocks' then
+                        doc.meta[key][i] = pandoc.MetaBlocks(
+                            process_links(pandoc.List(val[i]))
+                        )
+                    end
+                end
+            end
         end
     end
     doc.blocks = process_links(doc.blocks)

@@ -16,7 +16,7 @@ local references = pandoc.List({})
 -- Extract the Div with identifer 'refs' if present, as well as
 -- any heading that immediately precedes it, and stores them in
 -- the variable `references`. To find a heading that precedes
--- the `refs` Div it needs to walk through the document
+-- the `refs` Div we need to walk through the document
 -- backwards, element by element.
 -- @param element a Div element
 -- @return an empty list if Div has identifier `refs`
