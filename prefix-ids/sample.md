@@ -21,6 +21,9 @@ references:
   page: 737-738
   DOI: 10.1038/171737a0
   language: en-GB
+arbitraryblocks: |
+  Prefixes are applied to [block texts in the metadata too]{#metadataspan},
+  including [links](#ref). 
 ---
 
 # Introduction {#sec:intro}

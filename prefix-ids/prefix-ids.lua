@@ -127,20 +127,35 @@ function process_doc(doc)
             return pandoc.Str('{#' .. new_id .. '}')
         end
     end
+    -- process_identifiers function
+    -- apply the add_prefix and add_prefix_strings to an element
+    -- with blocks
+    process_identifiers = function(blocks)
+        local div = pandoc.walk_block(pandoc.Div(blocks), {
+            Span = add_prefix,
+            Link = add_prefix,
+            Image = add_prefix,
+            Code = add_prefix,
+            Div = add_prefix,
+            Header = add_prefix,
+            Table = add_prefix,
+            CodeBlock = add_prefix,
+            Str = pandoc_crossref and add_prefix_string
+        })
+        return div.content
+    end
 
-    -- apply the functions to all elements with identifier
-    local div = pandoc.walk_block(pandoc.Div(doc.blocks), {
-        Span = add_prefix,
-        Link = add_prefix,
-        Image = add_prefix,
-        Code = add_prefix,
-        Div = add_prefix,
-        Header = add_prefix,
-        Table = add_prefix,
-        CodeBlock = add_prefix,
-        Str = pandoc_crossref and add_prefix_string
-    })
-    doc.blocks = div.content
+    -- prefix identifiers in doc and in metadata fields with blocks content
+    -- NB: we can't use element.t if the value is a boolean
+    for key,val in pairs(doc.meta) do
+        if not (val == true or val == false or val == nil) 
+           and val.t == 'MetaBlocks' then
+              doc.meta[key] = pandoc.MetaBlocks(
+                            process_identifiers(pandoc.List(val))
+                        )
+        end
+    end
+    doc.blocks = process_identifiers(doc.blocks)
 
     -- function to add prefixes to links
     local add_prefix_to_link = function (link)
@@ -181,12 +196,26 @@ function process_doc(doc)
         end
         return cite
     end
+    -- function to process links and cites in some blocks
+    process_links = function(blocks) 
+        local div = pandoc.walk_block(pandoc.Div(blocks), {
+            Link = add_prefix_to_link,
+            Cite = pandoc_crossref and add_prefix_to_crossref_cites
+        })
+        return div.content
+    end
 
-    div = pandoc.walk_block(pandoc.Div(doc.blocks), {
-        Link = add_prefix_to_link,
-        Cite = pandoc_crossref and add_prefix_to_crossref_cites
-    })
-    doc.blocks = div.content
+    -- process links and cites in doc and in metablocks fields
+    -- NB: we can't use element.t if the value is a boolean
+    for key,val in pairs(doc.meta) do
+        if not (val == true or val == false or val == nil) 
+           and val.t == 'MetaBlocks' then
+              doc.meta[key] = pandoc.MetaBlocks(
+                            process_links(pandoc.List(val))
+                        )
+        end
+    end
+    doc.blocks = process_links(doc.blocks)
 
     -- return the result
     return doc
