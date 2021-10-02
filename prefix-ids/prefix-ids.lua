@@ -128,8 +128,7 @@ function process_doc(doc)
         end
     end
     -- process_identifiers function
-    -- apply the add_prefix and add_prefix_strings to an element
-    -- with blocks
+    -- apply the add_prefix and add_prefix_strings functions to blocks
     process_identifiers = function(blocks)
         local div = pandoc.walk_block(pandoc.Div(blocks), {
             Span = add_prefix,
