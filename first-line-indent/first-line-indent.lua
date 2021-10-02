@@ -38,7 +38,7 @@ local options = {
     'OrderedList',
   }),
   remove_after_class = pandoc.List({
-    'statement',
+    'statement', 'argument',
   }),
   dont_remove_after_class = pandoc.List:new(),
   size = "1em",
