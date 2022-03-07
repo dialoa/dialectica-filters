@@ -25,8 +25,6 @@ header-includes:
 
 This sample tests the filter on a document with a metadata header-includes of the MetaList type.
 
-First paragraph. In English-style typography, the first paragraph shouldn't have a first-line indent, nor the paragraphs below headers.
-
 This paragraph should start with a first-line indent. But after this quote:
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit.

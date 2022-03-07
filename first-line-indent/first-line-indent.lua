@@ -4,7 +4,7 @@
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 0.2
 ]]
 
 -- # Options
@@ -88,6 +88,19 @@ local header_code = {
 ]],
 }
 
+--- type: pandoc-friendly type function
+-- pandoc.utils.type is only defined in Pandoc >= 2.17
+-- if it isn't, we extend Lua's type function to give the same values
+-- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+-- string and booleans
+-- Caution: not to be used on non-Meta Pandoc elements, the 
+-- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+-- >=2.17, the .t string in <2.17).
+local type = pandoc.utils.type or function (obj)
+        local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
+        return tag and tag ~= 'Map' and tag or type(obj)
+    end
+
 --- add_header_includes: add a block to the document's header-includes 
 -- meta-data field.
 -- @param meta the document's metadata block
@@ -101,7 +114,7 @@ local function add_header_includes(meta, blocks)
   -- add any exisiting meta['header-includes']
   -- it can be MetaInlines, MetaBlocks or MetaList
   if meta['header-includes'] then
-    if meta['header-includes'].t == 'MetaList' then
+    if type(meta['header-includes']) == 'List' then
       header_includes:extend(meta['header-includes'])
     else
       header_includes:insert(meta['header-includes'])
@@ -165,7 +178,7 @@ function process_metadata(meta)
     -- MetaInlines and MetaList, we standardize to the latter
     for _,key in ipairs({'remove-after','dont-remove-after',
                   'remove-after-class','dont-remove-after-class'}) do
-      if user_options[key] and user_options[key].t == 'MetaInlines' then
+      if user_options[key] and type(user_options[key]) == 'Inlines' then
         user_options[key] = pandoc.MetaList({user_options[key]})
       end
     end
@@ -182,7 +195,7 @@ function process_metadata(meta)
       }) do
 
       if user_options[metakey] 
-        and user_options[metakey].t == 'MetaList' then
+        and type(user_options[metakey]) == 'List' then
 
           for _,item in ipairs(user_options[metakey]) do
 
@@ -201,7 +214,7 @@ function process_metadata(meta)
       }) do
 
       if user_options[metakey] 
-        and user_options[metakey].t == 'MetaList' then
+        and type(user_options[metakey]) == 'List' then
 
         -- list of strings to be removed
         local blacklist = pandoc.List:new()

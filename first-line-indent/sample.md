@@ -15,8 +15,14 @@ first-line-indent:
   dont-remove-after-class: keepit
 ---
 
-First paragraph. In English-style typography, the first paragraph shouldn't have a first-line indent, nor the paragraphs below headers.
-
+This document tests the first-line indent mode. In English-style typography, 
+a first-line indent is only applied when needed to separate a paragraph from
+the preceding paragraph. Hence there is no first-line indent below section
+or chapter headings (as opposed to French-style typography). By the same
+logic, the first paragraph below an article title and the first paragraph of
+a document without title should not be indented. However, LaTeX classes 
+indent them. We follow this practice here - so this paragraph should be
+indented.
 This paragraph should start with a first-line indent. But after this quote:
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit.
