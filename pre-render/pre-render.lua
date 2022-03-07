@@ -77,6 +77,19 @@ local acceptable_scopes = pandoc.List:new(
 
 -- # Helper functions
 
+--- type: pandoc-friendly type function
+-- pandoc.utils.type is only defined in Pandoc >= 2.17
+-- if it isn't, we extend Lua's type function to give the same values
+-- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+-- string and booleans
+-- Caution: not to be used on non-Meta Pandoc elements, the 
+-- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+-- >=2.17, the .t string in <2.17).
+local type = pandoc.utils.type or function (obj)
+        local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
+        return tag and tag ~= 'Map' and tag or type(obj)
+    end
+
 --- message: send message to std_error
 -- @param type string INFO, WARNING, ERROR
 -- @param text string message text
@@ -195,7 +208,7 @@ function get_options(meta)
   -- and store it into `options.header`
   local collect_header_includes = function(meta_elem) 
     -- ensure it's a list
-    if meta_elem.t ~= 'MetaList' then
+    if type(meta_elem) ~= 'List' then
       meta_elem = pandoc.MetaList({ meta_elem })
     end
     -- turn each item into a Div (pandoc.walk_block doesn't
@@ -203,9 +216,9 @@ function get_options(meta)
     -- header LaTeX code
     for _,item in ipairs(meta_elem) do
       local div = {}
-      if item.t == 'MetaInlines' then
+      if type(item) == 'Inlines' then
         div = pandoc.Div(pandoc.Plain(pandoc.List(item)))
-      elseif item.t == 'MetaBlocks' then
+      elseif type(item) == 'Blocks' then
         div = pandoc.Div(pandoc.List(item))
       end
       if div ~= {} then 
@@ -243,9 +256,9 @@ function get_options(meta)
 
     -- ensure it's a map
     -- if not, we assume it's a `scope` option
-    if meta['pre-render'].t ~= 'MetaMap' then 
+    if type(meta['pre-render']) ~= 'table' then 
       meta['pre-render'] = pandoc.MetaMap({
-        scope = meta['pre-render']
+        scope = pandoc.utils.stringify(meta['pre-render'])
       })
     end
     local opt_map = meta['pre-render']
@@ -253,13 +266,12 @@ function get_options(meta)
     if opt_map.scope then
       if acceptable_scopes:find(pandoc.utils.stringify(opt_map.scope)) then
         options.scope = pandoc.utils.stringify(opt_map.scope)
-      end
     end
     -- `exclude-formats`
     if opt_map['exclude-formats'] then
       options.exclude_formats = pandoc.List:new()
       -- ensure the value is a list
-      if opt_map['exclude-formats'].t ~= 'MetaList' then
+      if type(opt_map['exclude-formats']) ~= 'List' then
         opt_map['exclude-formats'] = pandoc.MetaList({ 
           opt_map['exclude-formats']
         })
