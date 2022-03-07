@@ -15,6 +15,20 @@ local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
 local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst'}) -- in Str elements
 local codeblock_captions = true -- is the codeblock caption syntax on?
 
+--- type: pandoc-friendly type function
+-- pandoc.utils.type is only defined in Pandoc >= 2.17
+-- if it isn't, we extend Lua's type function to give the same values
+-- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+-- string and booleans
+-- Caution: not to be used on non-Meta Pandoc elements, the 
+-- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+-- >=2.17, the .t string in <2.17).
+local type = pandoc.utils.type or function (obj)
+        local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
+        return tag and tag ~= 'Map' and tag or type(obj)
+    end
+
+
 --- get_options: get filter options for document's metadata
 -- @param meta pandoc Meta element
 function get_options(meta)
@@ -44,7 +58,7 @@ function get_options(meta)
             pandoc_crossref = false
         end
         if meta['prefix-ids'].ignoreids and 
-            meta['prefix-ids'].ignoreids.t == 'MetaList' then
+            type(meta['prefix-ids'].ignoreids) == 'List' then
             ids_to_ignore:extend(meta['prefix-ids'].ignoreids)
         end
         
@@ -145,20 +159,17 @@ function process_doc(doc)
     end
 
     -- prefix identifiers in doc and in metadata fields with blocks content
-    -- NB: we can't use element.t if the value is a boolean
     for key,val in pairs(doc.meta) do
-        if not (val == true or val == false or val == nil) then
-            if val.t == 'MetaBlocks' then
-              doc.meta[key] = pandoc.MetaBlocks(
-                            process_identifiers(pandoc.List(val))
-                        )
-            elseif val.t == 'MetaList' then
-                for i = 1, #val do
-                    if val[i].t == 'MetaBlocks' then
-                        doc.meta[key][i] = pandoc.MetaBlocks(
-                            process_identifiers(pandoc.List(val[i]))
-                        )
-                    end
+        if type(val) == 'Blocks' then
+          doc.meta[key] = pandoc.MetaBlocks(
+                        process_identifiers(pandoc.List(val))
+                    )
+        elseif type(val) == 'List' then
+            for i = 1, #val do
+                if type(val[i]) == 'Blocks' then
+                    doc.meta[key][i] = pandoc.MetaBlocks(
+                        process_identifiers(pandoc.List(val[i]))
+                    )
                 end
             end
         end
@@ -214,20 +225,17 @@ function process_doc(doc)
     end
 
     -- process links and cites in doc and in metablocks fields
-    -- NB: we can't use element.t if the value is a boolean
     for key,val in pairs(doc.meta) do
-        if not (val == true or val == false or val == nil) then
-            if val.t == 'MetaBlocks' then
-              doc.meta[key] = pandoc.MetaBlocks(
-                            process_links(pandoc.List(val))
-                        )
-            elseif val.t == 'MetaList' then
-                for i = 1, #val do
-                    if val[i].t == 'MetaBlocks' then
-                        doc.meta[key][i] = pandoc.MetaBlocks(
-                            process_links(pandoc.List(val[i]))
-                        )
-                    end
+        if type(val) == 'Blocks' then
+          doc.meta[key] = pandoc.MetaBlocks(
+                        process_links(pandoc.List(val))
+                    )
+        elseif type(val) == 'List' then
+            for i = 1, #val do
+                if type(val[i]) == 'Blocks' then
+                    doc.meta[key][i] = pandoc.MetaBlocks(
+                        process_links(pandoc.List(val[i]))
+                    )
                 end
             end
         end
