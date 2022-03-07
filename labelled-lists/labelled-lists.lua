@@ -55,6 +55,19 @@ local labels_by_id = {}
 
 -- # Helper functions
 
+--- type: pandoc-friendly type function
+-- pandoc.utils.type is only defined in Pandoc >= 2.17
+-- if it isn't, we extend Lua's type function to give the same values
+-- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+-- string and booleans
+-- Caution: not to be used on non-Meta Pandoc elements, the 
+-- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+-- >=2.17, the .t string in <2.17).
+local type = pandoc.utils.type or function (obj)
+        local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
+        return tag and tag ~= 'Map' and tag or type(obj)
+    end
+
 --- format_matches: Test whether the target format is in a given list.
 -- @param formats list of formats to be matched
 -- @return true if match, false otherwise
@@ -350,7 +363,7 @@ function write_meta(meta)
         -- add any exisiting meta['header-includes']
         -- it can be MetaInlines, MetaBlocks or MetaList
         if meta['header-includes'] then
-            if meta['header-includes'].t == 'MetaList' then
+            if type(meta['header-includes']) == 'List' then
               header_includes:extend(meta['header-includes'])
             else
               header_includes:insert(meta['header-includes'])
@@ -413,7 +426,7 @@ function get_options(meta)
 
     -- default-delimiter: string
     if meta['labelled-lists'].delimiter and 
-            meta['labelled-lists'].delimiter.t == 'MetaInlines' then
+            type(meta['labelled-lists'].delimiter) == 'Inlines' then
         local delim = read_delimiter(pandoc.utils.stringify(
                         meta['labelled-lists'].delimiter))
         if delim then options.delimiter = delim end
