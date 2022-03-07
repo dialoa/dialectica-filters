@@ -8,7 +8,7 @@ header-includes: |
 standalone: false
 ---
 
-A *sample* document to *[serialize](#ref)* things.
+A *sample* document to *[serialize](#serialize)* things.
 
 # Introduction {#serialize}
 

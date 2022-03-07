@@ -4,28 +4,40 @@ within Lua filters
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 0.2
 ]]
 
 --- to_json: converts a entire Pandoc document to json
--- run_json_filter passes a Pandoc object as json to stdin
--- we use regex to put it in the RawBlock of a wrapping json
--- representation of a Pandoc object, so that we can
--- get back the json string
--- @param doc pandoc Pandoc object
--- @string if success, nil if failed
+-- @param doc pandoc Pandoc object to be converted to json
+-- @return string json string representation if success, nil if failed
 -- @TODO in Win, use Python or Perl if present, powershell is slow
 function to_json(doc)
 
-	-- check that doc is a Pandoc object
+	-- in Pandoc >= 2.17, we can simply use pandoc.write
+	if PANDOC_VERSION >= '2.17' then
+		if pandoc.utils.type(doc) == 'Pandoc' then
+			return pandoc.write(doc, 'json')
+		else
+			return nil
+		end
+	end
+
+	-- in Pandoc <= 2.17, first confirm that doc is Pandoc object
 	if not (doc.meta and doc.blocks) then
 		return nil
 	end
-	-- prepare command to wrap json stdin in a json representation
-	-- of a Pandoc document. Use sed on *nix and powershell on windows
+
+	-- pandoc.utils.run_json_filter(doc, command) converts the Pandoc
+	-- doc to its JSON representation, sends it to stdin, executes
+	-- `command` expects a JSON representation of a Pandoc document 
+	-- return. Our `command` simply wraps the json string Pandoc 
+	-- stands to stdin in (a JSON representation) of a Pandoc document
+	-- with a Rawblock containing that string. 
+	-- we use `sed` on MacOs/Linux systems and Powershell on Win.
 	local command = ''
 	local arguments = pandoc.List:new()
-	--	strings to build an empty document with a RawBlock element
+	-- strings to build an json representation of an empty document 
+	-- with a RawBlock element
 	local api_ver_str = tostring(PANDOC_API_VERSION):gsub('%.',',')
 	local before = '{"pandoc-api-version":[' .. api_ver_str .. '],'
 		.. [["meta":{},"blocks":[{"t":"RawBlock","c":["json","]]
@@ -76,8 +88,8 @@ function to_json(doc)
 	end
 
 	-- catch the result in the `text` field of the first block
-	-- return nil if faileds
-	return result.blocks[1].c[2] or nil
+	-- return nil if failed
+	return result.blocks[1].text or nil
 
 end
 
