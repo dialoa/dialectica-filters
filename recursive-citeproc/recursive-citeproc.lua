@@ -4,14 +4,10 @@
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 0.2
 ]]
 
 -- # Internal settings
-
--- NB how to load and use from other filters:
---package.path = '../tools/pprint.lua'
---local pprint = require('pprint.lua')
 
 --- Options map, including defaults.
 local options = {
@@ -22,6 +18,20 @@ local options = {
 depth = 0
 
 -- # Filter functions
+
+--- type: pandoc-friendly type function
+-- pandoc.utils.type is only defined in Pandoc >= 2.17
+-- if it isn't, we extend Lua's type function to give the same values
+-- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+-- string and booleans
+-- Caution: not to be used on non-Meta Pandoc elements, the 
+-- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+-- >=2.17, the .t string in <2.17).
+local type = pandoc.utils.type or function (obj)
+        local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
+        return tag and tag ~= 'Map' and tag or type(obj)
+    end
+
 
 --- get_options: get filter options for document's metadata
 -- @param meta pandoc Meta element
@@ -44,15 +54,15 @@ end
 function parse_nocite(nocite)
     local result = pandoc.List:new()
     local inlines = pandoc.List:new()
-    if nocite.t == 'MetaInlines' then
+    if type(nocite) == 'Inlines' then
         inlines = nocite
-    elseif nocite.t == 'MetaBlocks' then
+    elseif type(nocite) == 'Blocks' then
         inlines = pandoc.utils.blocks_to_inlines(nocite)
-    elseif nocite.t == 'MetaList' then
+    elseif type(nocite) == 'List' then
         for _,item in ipairs(nocite) do
-            if item.t == 'MetaInlines' then
+            if type(item) == 'Inlines' then
                 inlines:extend(item)
-            elseif item.t == 'MetaBlocks' then
+            elseif type(item) == 'Blocks' then
                 inlines:extend(pandoc.utils.blocks_to_inlines(item))
             end
         end

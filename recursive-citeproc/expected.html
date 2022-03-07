@@ -31,6 +31,9 @@
         font-size: 0.9em;
         padding: 1em;
       }
+      h1 {
+        font-size: 1.8em;
+      }
     }
     @media print {
       body {
@@ -135,6 +138,12 @@
     #TOC li {
       list-style: none;
     }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
     #TOC a:not(:hover) {
       text-decoration: none;
     }
@@ -174,16 +183,22 @@
 <h1 class="title">Self-citing bibliography example</h1>
 <p class="author">Julien Dutant</p>
 </header>
-<p><span class="citation" data-cites="Doe2000">(<a href="#ref-Doe2000" role="doc-biblioref">Doe 2000</a>)</span>.</p>
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<p><span class="citation" data-cites="Doe2000">(<a href="#ref-Doe2000"
+role="doc-biblioref">Doe 2000</a>)</span>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="doc-bibliography">
 <div id="ref-Doe1980" class="csl-entry" role="doc-biblioentry">
 Doe, Jane E. 1980. <em>A Long Journey</em>.
 </div>
 <div id="ref-Doe1990" class="csl-entry" role="doc-biblioentry">
-———. 1990. <em>A Long Journey</em>. Reprint of <span class="citation" data-cites="Doe1980">Doe (<a href="#ref-Doe1980" role="doc-biblioref">1980</a>)</span>.
+———. 1990. <em>A Long Journey</em>. Reprint of <span class="citation"
+data-cites="Doe1980">Doe (<a href="#ref-Doe1980"
+role="doc-biblioref">1980</a>)</span>.
 </div>
 <div id="ref-Doe2000" class="csl-entry" role="doc-biblioentry">
-———. 2000. <em>A Long Journey</em>. Reprint of <span class="citation" data-cites="Doe1990">Doe (<a href="#ref-Doe1990" role="doc-biblioref">1990</a>)</span>.
+———. 2000. <em>A Long Journey</em>. Reprint of <span class="citation"
+data-cites="Doe1990">Doe (<a href="#ref-Doe1990"
+role="doc-biblioref">1990</a>)</span>.
 </div>
 <div id="ref-Smith1980" class="csl-entry" role="doc-biblioentry">
 Smith, Al. 1980. <span>“Thoughts.”</span> <em>Varia</em> 1: 1–15.
