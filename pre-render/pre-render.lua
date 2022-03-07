@@ -8,7 +8,7 @@ with class "pre-render" will be pre-rendered as svg images.
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 0.2
 @see inspired by John MacFarlane's filter "Building images with TiKZ"
   in pandoc's documentation <https://pandoc.org/lua-filters.html#examples>
 @see Oltolm's similar `pandoc-latex-math` filter 

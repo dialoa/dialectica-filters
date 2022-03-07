@@ -3,7 +3,7 @@
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 0.2
 ]]
 
 -- # Global variables
