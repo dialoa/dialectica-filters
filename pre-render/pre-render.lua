@@ -196,7 +196,7 @@ end
 -- @param meta Meta object
 function get_options(meta)
 
-  -- filter to complie tex header
+  -- filter to concatenate tex header
   local compile_tex_header = function(elem)
       -- nb, LaTeX written directly in markdown is format `tex`
       -- LaTeX written within a native raw or span is format `latex`
@@ -212,7 +212,7 @@ function get_options(meta)
       meta_elem = pandoc.MetaList({ meta_elem })
     end
     -- turn each item into a Div (pandoc.walk_block doesn't
-    -- work on Meta elements), apply a filter that compiles
+    -- work on Meta elements), apply a filter that concatenates
     -- header LaTeX code
     for _,item in ipairs(meta_elem) do
       local div = {}
@@ -266,6 +266,7 @@ function get_options(meta)
     if opt_map.scope then
       if acceptable_scopes:find(pandoc.utils.stringify(opt_map.scope)) then
         options.scope = pandoc.utils.stringify(opt_map.scope)
+      end
     end
     -- `exclude-formats`
     if opt_map['exclude-formats'] then
