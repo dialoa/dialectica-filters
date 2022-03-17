@@ -259,13 +259,13 @@ function build_list(element)
             local inlines = pandoc.List:new()
             inlines:insert(pandoc.RawInline('latex','\\item['))
             inlines:extend(style_label(label, delim))
+            inlines:insert(pandoc.RawInline('latex',']'))
             if not(id == '') then 
                 inlines:insert(pandoc.RawInline('latex',
                     '\\labelledlistlabel{' .. id .. '}{'))
                 inlines:extend(label)
                 inlines:insert(pandoc.RawInline('latex', '}'))
             end
-            inlines:insert(pandoc.RawInline('latex',']'))
 
             -- if the first block is Plain or Para, we insert
             -- the label code at the beginning
