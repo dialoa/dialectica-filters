@@ -10,11 +10,10 @@
 -- # Internal settings
 
 --- Options map, including defaults.
--- @set_header_includes boolean whether to add code in header-includes
--- @citation_syntax boolean whether to use pandoc-crossref cite syntax
+-- @disable_citations boolean whether to use pandoc-crossref cite syntax
+-- @delimiter list label delimiters (as a list)
 local options = {
-    set_header_includes = true,
-    citation_syntax = true,
+    disable_citations = false,
     delimiter = {'(',')'},
 }
 
@@ -30,22 +29,6 @@ local html_classes = {
     item = 'labelled-lists-item',
     label = 'labelled-lists-label',
     list = 'labelled-lists-list',
-}
-
--- Code for header-includes.
--- LaTeX hack https://tex.stackexchange.com/questions/1230/reference-name-of-description-list-item-in-latex
-local header_code = {
-  latex = [[
-% labelled-lists: code for crossreferencing by custom labels
-\makeatletter
-    \def\labelledlistlabel#1#2{\begingroup
-    \def\@currentlabel{#2}%
-    \label{#1}\endgroup
-    }
-\makeatother
-  ]],
-  html = [[
-  ]]
 }
 
 -- # Global variable
@@ -130,32 +113,19 @@ function filter_citations(cite)
 
         local inlines = pandoc.List:new()
 
-        -- replace citation with \ref in LaTeX, create Link otherwise
-        if FORMAT:match('latex') then
+        -- create link(s)
 
-            for i = 1, #cite.citations do
-               inlines:insert(pandoc.RawInline('latex', 
-                '\\ref{' .. cite.citations[i].id .. '}'))
-                -- add separator if needed
-                if #cite.citations > 1 and i < #cite.citations then
-                    inlines:insert(pandoc.RawInline('latex', '; '))
-                end
+        for i = 1, #cite.citations do
+           inlines:insert(pandoc.Link(
+                labels_by_id[cite.citations[i].id],
+                '#' .. cite.citations[i].id
+            ))
+            -- add separator if needed
+            if #cite.citations > 1 and i < #cite.citations then
+                inlines:insert(pandoc.Str('; '))
             end
-
-        else 
-
-            for i = 1, #cite.citations do
-               inlines:insert(pandoc.Link(
-                    labels_by_id[cite.citations[i].id],
-                    '#' .. cite.citations[i].id
-                ))
-                -- add separator if needed
-                if #cite.citations > 1 and i < #cite.citations then
-                    inlines:insert(pandoc.Str('; '))
-                end
-            end
-
         end
+
 
         if bracketed then
             inlines:insert(1, pandoc.Str('('))
@@ -174,19 +144,16 @@ end
 -- @param element pandoc AST link
 -- @TODO in LaTeX output you need \ref and \label
 function filter_links (link)
+
     if pandoc.utils.stringify(link.content) == '' 
         and link.target:sub(1,1) == '#' 
         and labels_by_id[link.target:sub(2,-1)] then
 
-        -- replace link with \ref in LaTeX, fill in text otherwise
-        if FORMAT:match('latex') then
-            return pandoc.RawInline('latex', 
-                '\\ref{' .. link.target:sub(2,-1) .. '}')
-        else
-            link.content = labels_by_id[link.target:sub(2,-1)]
+        link.content = labels_by_id[link.target:sub(2,-1)]
             return link
-        end
+
     end
+
 end
 
 -- style_label: style the label
@@ -260,12 +227,10 @@ function build_list(element)
             inlines:insert(pandoc.RawInline('latex','\\item['))
             inlines:extend(style_label(label, delim))
             inlines:insert(pandoc.RawInline('latex',']'))
+            -- create link target if needed
             if not(id == '') then 
-                inlines:insert(pandoc.RawInline('latex',
-                    '\\labelledlistlabel{' .. id .. '}{'))
-                inlines:extend(label)
-                inlines:insert(pandoc.RawInline('latex', '}'))
-            end
+                inlines:insert(pandoc.Span('', {id = id}))
+            end            
 
             -- if the first block is Plain or Para, we insert
             -- the label code at the beginning
@@ -351,37 +316,6 @@ function is_custom_labelled_list (element)
     return is_cl_list
 end
 
---- Write meta: add header-includes to the document's metadata.
--- @param meta pandoc Meta block
--- @return processed block
-function write_meta(meta)
-
-    if options.set_header_includes and header_code[FORMAT] then
-
-        local header_includes = pandoc.List:new()
-
-        -- add any exisiting meta['header-includes']
-        -- it can be MetaInlines, MetaBlocks or MetaList
-        if meta['header-includes'] then
-            if type(meta['header-includes']) == 'List' then
-              header_includes:extend(meta['header-includes'])
-            else
-              header_includes:insert(meta['header-includes'])
-            end
-        end
-
-        header_includes:insert(pandoc.MetaBlocks({
-            pandoc.RawBlock(FORMAT, header_code[FORMAT])
-        }))
-
-        meta['header-includes'] = header_includes
-
-        return meta
-
-    end
-
-end
-
 --- read_delimiter: process a delimiter option
 -- @delim: string, e.g. `Parens` or `[%1]`
 -- @return: a pair of delimiter strings
@@ -415,14 +349,10 @@ end
 function get_options(meta)
   if meta['labelled-lists'] then
 
-    -- set-header-includes: boolean
-    if meta['labelled-lists']['set-header-includes'] ~= nil then
-      if meta['labelled-lists']['set-header-includes'] then
-        options.set_header_includes = true
-      else
-        options.set_header_includes = false
-      end
+    if meta['labelled-lists']['disable-citations'] then
+        options.disable_citations = true
     end
+
 
     -- default-delimiter: string
     if meta['labelled-lists'].delimiter and 
@@ -447,12 +377,11 @@ process_lists_filter = {
             return build_list(element)
         end
     end,
-        Meta = write_meta
 }
 crossreferences_filter = {
     Link = filter_links,
     Cite = function(element) 
-        if options.citation_syntax then 
+        if not options.disable_citations then 
             return filter_citations(element)
         end
     end

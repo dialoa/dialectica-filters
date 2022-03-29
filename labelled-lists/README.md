@@ -3,6 +3,7 @@ title: "Labelled-lists - Custom labelled lists in Pandoc's markdown"
 author: "Julien Dutant"
 labelled-lists:
   delimiter: )
+  disable-citations: false
 ---
 
 Labelled-lists
@@ -96,7 +97,8 @@ Possible values:
   as markdown: `*%1*` will surround your label with asterisks, not make
   it italic.
 
-This can be set on a list basis by using a `delimiter` attribute on the first
+This can be set for a specific list by using a `delimiter` 
+attribute on the first
 span element of your list (same possible values as above):
 
 ```markdown
@@ -196,20 +198,15 @@ as follows:
 title: My document
 author: John Doe
 labelled-lists:
-  set-header-includes: false
-  citation-syntax: false
+  disable-citations: true
+  delimiter: Period
 ```
 
 That is the metadata field `labelled-lists` contains the filter options as
 a map. Presently the filter has just one option:
 
-* `set-header-includes`: if true, the filter supplements the document's 
-  meta-data with header-include code needed to style custom label lists in 
-  the output. Set to `false` or `no` if you would rather provide this code 
-  yourself in a CSS file or custom Pandoc template. (default true)
-* `citation-syntax`: if true, the filter will process cross-references
-  made with the citation syntax. (default: true)
-
+* `disable-citations`: if true, the filter will not process cross-references
+  made with the citation syntax. (default: false)
 
 Examples and tests
 ------------------
@@ -226,7 +223,7 @@ Examples and tests
 
 Ignored: these are not treated as labels.
 
-### Small caps 
+### Small caps
 
 * [[All]{.smallcaps}]{} This list uses
 * [[Some]{.smallcaps}]{} latex code as labels.
@@ -236,7 +233,7 @@ Ignored: these are not treated as labels.
 * [A1]{} $$F(x) > G(x)$$
 * [A2]{} $$G(x) > H(x)$$
 
-### items with several blocks 
+### items with several blocks
 * [**B1**]{} This list's items
 
     consist of several blocks
@@ -257,7 +254,7 @@ Ignored: these are not treated as labels.
   turpis egestas. Cras consequat nisi at ex finibus, in condimentum erat auctor.
   In at nulla at est iaculis pulvinar sed id diam. Cras malesuada sit amet tellus id molestie.
 
-### cross-reference with citation syntax 
+### cross-reference with citation syntax
 
 * [**B1**]{#B1ref} This is the first claim.
 * [B2]{#B2ref} This is the second claim.
