@@ -140,7 +140,7 @@ The basic syntax is:
   in parentheses: (**A1**). A prefix and suffix can be specified too:
   `[remember @A1ref and the like]` will output (remember **A1** and the like).
 * The suppressed author style, `[-@A1ref]`, will be processed 
-  as normal reference
+  as normal reference: label with its formatting in parentheses.
 
 You can crossrefer to several custom labels at a time: 
 `[@A1ref; @A2ref]`. But mixing references to a custom label
