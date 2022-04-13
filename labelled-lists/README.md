@@ -54,7 +54,7 @@ to see the result):
 * [Conclusion]{} This is the conclusion.
 
 In general, the filter will turn a bullet list into a custom label
-list provided that *every item starts with a non-empty Span
+list provided that *every item starts with a Span
 element*.
 
 * A Span element is inline text (i.e., not block like a paragraph)
@@ -65,12 +65,9 @@ element*.
   brackets must be present: `[label]` won't work, `[label]{}` will.
 * The label can include formatting. `[**T1**]{}` will generate a label with
   strong emphasis (bold by default).
-* For the purposes of this filter, a Span is *non-empty* if its inline
-  text is not empty. Thus `[]{}` will not work. Numbers or other unicode
-  characters work. To generate an empty
-  label, use a space or other invisible character, e.g. `[ ]
-  {}`. *Exception*: math formulas will work as labels, but if the inline 
-  text only contains LaTeX code (`\textsc{a}`) it will be treated as empty.
+* Label Spans can be empty. Thus `[]{}` will work, though it will be
+  typeset as `()` unless you change the list delimiters to 'none'.
+* Numbers, unicode characters, maths formulas can be used as Spans.
 * Span elements can also be entered using HTML syntax: `<span>inline text
   </span>`. See [Pandoc manual]
   (https://pandoc.org/MANUAL.html#divs-and-spans) for details. 
