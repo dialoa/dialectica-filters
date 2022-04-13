@@ -88,7 +88,7 @@ labelled-lists:
 
 Possible values:
 
-* `''` or 'None' (empty string) for no delimiter
+* `''` or 'none' (empty string) for no delimiter
 * `()` or `(` or `TwoParens` for "(Label)" (default)
 * `.` or `Period` for a dot "Label."
 * `)` or `OneParen` for "Label)"

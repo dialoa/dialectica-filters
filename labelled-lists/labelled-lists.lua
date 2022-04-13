@@ -305,9 +305,10 @@ function is_custom_labelled_list (element)
     for _,blocks in ipairs(element.c) do
 
         -- check that the first element of the first block is Span
-        -- and not empty
-        if not( blocks[1].c[1].t == 'Span' ) or 
-            pandoc.utils.stringify(blocks[1].c[1].content) == '' then
+        -- ~~and not empty~~ allowing empty
+        if not( blocks[1].c[1].t == 'Span' ) 
+            -- or pandoc.utils.stringify(blocks[1].c[1].content) == '' 
+            then
             is_cl_list = false
             break 
         end
@@ -323,7 +324,7 @@ function read_delimiter(delim)
     delim = pandoc.utils.stringify(delim)
 
     --- process standard Pandoc attributes and their equivalent
-    if delim == '' or delim == 'None' then
+    if delim == '' or delim:lower() == 'none' then
         return {'',''}
     elseif delim == 'Period' or delim == '.' then
         return {'', '.'}
