@@ -17,6 +17,12 @@ function Image(img)
 								img,
 								pandoc.RawInline('latex', '\\end{center}'),
 							}
+
+		elseif FORMAT:match('html')
+						or FORMAT:match('epub') then
+			img.attributes.style = img.attributes.style 
+							and img.attributes.style..'margin:auto; display:block;'
+							or 'margin:auto; display:block;'
 		end
 
 	end
