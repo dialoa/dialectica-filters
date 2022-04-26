@@ -26,3 +26,6 @@ expected.html: sample.md image-attributes.lua
 expected.tex: sample.md image-attributes.lua
 	pandoc -s --lua-filter image-attributes.lua --to=latex $< \
 		--output $@
+
+clean:
+	@rm expected.*
