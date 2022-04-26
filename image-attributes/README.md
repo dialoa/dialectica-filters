@@ -31,13 +31,16 @@ In your markdown source, add attributes to the image element:
 
 ## Currently supported attributes
 
-`center`
-: center the image. Warning: do not use on images that will be
-  treated as figures. See [Pandoc's manual](https://pandoc.org/MANUAL.html#images) for more details.
-: output formats supported: LaTeX. HTML-based formats can be 
-  supported by styling the css element `.img.center`.
+### `center`
 
-## Limitations
+Center the image. Supported output formats: LaTeX/PDF, HTML, EPUB.
+
+Warning: do not use on images that will be
+treated as figures. Images are treating as figure if they have
+a caption and are alone in a paragraph, i.e., surrounded by
+blank line. See [Pandoc's manual](https://pandoc.org/MANUAL.html#images) for more details.
+
+## Troubleshotting
 
 In LaTeX output, an image followed by a manual line break
 will thrown an error. Source code:
