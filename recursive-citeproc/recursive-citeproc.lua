@@ -4,7 +4,7 @@
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.2
+@release 0.2.1
 ]]
 
 -- # Internal settings
@@ -132,6 +132,11 @@ end
 -- run again until none is added. 
 -- @param document pandoc Pandoc element
 function recursive_citeproc(document)
+
+    -- do nothing if the bibliography field is empty
+    if pandoc.utils.stringify(document.meta.bibliography) == '' then
+        return
+    end
 
     local all_cites, nocite_cites = collect_citations_ids(document)
 
