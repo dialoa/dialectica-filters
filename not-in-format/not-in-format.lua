@@ -26,6 +26,14 @@ function Div(element)
       return {}
   end
 
+  if element.classes:includes('only-in-format') then
+    if element.classes:find_if(function (x) return FORMAT:match(x) end) then
+      return nil -- do not change anything
+    else
+      return {}
+    end
+  end  
+
   -- else the function returns `nil` and Pandoc leaves the element as is
 
 end

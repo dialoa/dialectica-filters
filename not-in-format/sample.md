@@ -10,9 +10,10 @@ in formats    latex, beamer
 
 :::
 
-~~~{=latex}
+::: {.only-in-format .latex .beamer}
 
-begin{tabular}{|c|c|}
+```{=latex}
+\begin{tabular}{|c|c|}
 \toprule
 This table & is used \\ \addlinespace
 \midrule
@@ -20,5 +21,6 @@ This table & is used \\ \addlinespace
 in formats & latex, beamer \\ \addlinespace
 \bottomrule
 \end{tabluar}
+```
 
-~~~
+:::
