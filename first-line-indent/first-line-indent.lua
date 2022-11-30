@@ -333,6 +333,8 @@ local function process_body(doc)
   -- result will be the new doc.blocks
   local result = pandoc.List({})
   local do_not_indent_next_block = false
+  -- if the first element is a paragraph, it shouldn't be indented
+  local is_first_element = true
 
   for _,elem in pairs(doc.blocks) do
 
@@ -351,6 +353,10 @@ local function process_body(doc)
         else
           result:extend(indent_markup('noindent', elem))
         end
+
+      elseif is_first_element then
+
+          result:extend(indent_markup('noindent', elem))
 
       elseif do_not_indent_next_block and options.auto_remove then
 
@@ -385,6 +391,8 @@ local function process_body(doc)
       result:insert(elem)
 
     end
+
+    is_first_element = false
 
   end
 

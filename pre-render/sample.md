@@ -17,7 +17,8 @@ header-includes:
   ```
 ---
 
-This should not be pre-rendered: $$p \rightarrow q \models \mathcal{Fa} $$.
+This should not be pre-rendered: 
+$$p \rightarrow q \models \mathcal{Fa} $$
 
 ::: pre-render
 This should be pre-rendered:
