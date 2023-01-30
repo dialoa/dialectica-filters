@@ -99,6 +99,23 @@ beginning of the paragraph:
 blockquote.
 ```
 
+_Warning: indent followed by citations_. If your paragraph starts
+with a square bracket citation, like so:
+
+```markdown
+\indent [@mycitation] Text ...
+```
+
+Pandoc will interpret the whole `\indent [@mycitation]` as a 
+LaTeX raw command, and the citation will not be displayed. 
+The solution is to explicit mark you `\indent`, `\noindent`
+command as Raw latex:
+
+```markdown`
+`\indent`{=tex} [@mycitation] Text...
+```
+
+
 ### Advanced usage
 
 The filter has options that can be specified in a [pandoc default

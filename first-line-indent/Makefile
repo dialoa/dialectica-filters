@@ -1,12 +1,12 @@
+# Use `test` to verify that the filter works well on your system
+# Use `regenerate` to regenerate the test files
+
 DIFF ?= diff --strip-trailing-cr -u
 
 .PHONY: test
 
-test: sample.md expected.html expected.tex \
-	sample_head-inc_1.md expected_hi_1.html expected_hi_1.tex \
-	sample_head-inc_2.md expected_hi_2.html expected_hi_2.tex \
-	sample_head-inc_3.md expected_hi_3.html expected_hi_3.tex \
-	first-line-indent.lua
+test: first-line-indent.lua sample.md \
+	sample_head-inc_1.md sample_head-inc_2.md sample_head-inc_3.md
 	@pandoc -s --lua-filter first-line-indent.lua --to=html sample.md \
 		| $(DIFF) expected.html -
 	@pandoc -s --lua-filter first-line-indent.lua --to=latex sample.md \
@@ -23,6 +23,11 @@ test: sample.md expected.html expected.tex \
 		| $(DIFF) expected_hi_3.html -
 	@pandoc -s --lua-filter first-line-indent.lua --to=latex sample_head-inc_3.md \
 		| $(DIFF) expected_hi_3.tex -
+
+regenerate: sample.md expected.html expected.tex \
+	sample_head-inc_1.md expected_hi_1.html expected_hi_1.tex \
+	sample_head-inc_2.md expected_hi_2.html expected_hi_2.tex \
+	sample_head-inc_3.md expected_hi_3.html expected_hi_3.tex
 
 expected.html: sample.md first-line-indent.lua
 	pandoc -s --lua-filter first-line-indent.lua --output $@ $<

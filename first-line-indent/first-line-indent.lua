@@ -49,14 +49,20 @@ local types_with_classes = pandoc.List({
 })
 
 -- # Filter global variables
--- @utils pandoc's module of utilities functions
+
+local stringify = pandoc.utils.stringify
+local equals = pandoc.utils.equals
+
 -- @param code map of pandoc objects for indent/noindent Raw code
 -- @param header_code map of pandoc code to add to header-includes
-local utils = pandoc.utils
 local code = {
-  latex = {
+  tex = {
     indent = pandoc.RawInline('tex', '\\indent '),
     noindent = pandoc.RawInline('tex', '\\noindent '),
+  },
+  latex = {
+    indent = pandoc.RawInline('latex', '\\indent '),
+    noindent = pandoc.RawInline('latex', '\\noindent '),
   },
   html = {
     indent = pandoc.RawBlock('html',
@@ -199,7 +205,7 @@ function process_metadata(meta)
 
           for _,item in ipairs(user_options[metakey]) do
 
-            options[optname]:insert(utils.stringify(item))
+            options[optname]:insert(stringify(item))
 
           end
 
@@ -221,7 +227,7 @@ function process_metadata(meta)
 
         for _,item in ipairs(user_options[metakey]) do
 
-          blacklist:insert(utils.stringify(item))
+          blacklist:insert(stringify(item))
 
         end
 
@@ -244,7 +250,7 @@ function process_metadata(meta)
       -- size are erased. But it ensures that the filter gets
       -- a string. Improvement: check that we have a string
       -- and throw a warning otherwise
-      options.size = utils.stringify(user_options['size'])
+      options.size = stringify(user_options['size'])
 
     end
 
@@ -281,46 +287,56 @@ function process_metadata(meta)
 
 end
 
---- Add format-specific explicit indent markup to a paragraph.
--- @param type string 'indent' or 'noindent', type of markup to add
--- @param elem pandoc AST paragraph
--- @return a list of blocks (containing a single paragraph element or
--- a rawblock and a paragraph element, depending on output format)
+---is_indent_cmd: tell whether an element is a 'indent' or 'noindent'
+---command.
+---@param elem Pandoc.Inline
+---@return string | nil 'indent', 'noindent' or nil
+local function is_indent_cmd(elem)
+  return (equals(elem, code.latex.indent)
+    or equals(elem, code.tex.indent)) and 'indent'
+    or (equals(elem, code.latex.noindent)
+    or equals(elem, code.tex.noindent)) and 'noindent'
+    or nil
+end
+
+---indent_markup: Add format-specific explicit indent markup to a paragraph.
+---@param type string 'indent' or 'noindent', type of markup to add
+---@param elem pandoc.Para
+---@return pandoc.Blocks result a list of blocks (containing a single paragraph element or
+---a rawblock and a paragraph element, depending on output format)
 local function indent_markup(type, elem)
+  result = pandoc.List:new()
 
   if FORMAT:match('latex') and (type == 'indent' or type == 'noindent') then
 
     -- in LaTeX, replace any `\indent` or `\noindent` command at
     -- the start of the paragraph with the desired one, add it otherwise
 
-    local content = pandoc.List(elem.content)
+    if elem.content[1] and is_indent_cmd(elem.content[1]) then
 
-    if content[1] and (utils.equals(content[1],
-        code.latex.indent) or utils.equals(content[1],
-        code.latex.noindent)) then
-
-      content[1] = code.latex[type]
+      elem.content[1] = code.tex[type]
 
     else
 
-      content:insert(1, code.latex[type])
+      elem.content:insert(1, code.tex[type])
 
     end
 
-    elem.content = content
-    return({ elem })
+    result:insert(elem)
 
   -- in HTML, insert a block (div) before the paragraph
 
   elseif FORMAT:match('html*') and (type == 'indent' or type == 'noindent') then
 
-    return({ code.html[type], elem })
+    result:extend({ code.html[type], elem })
 
   else
 
-    return({elem})
+    result:insert(elem)
 
   end
+
+  return result
 
 end
 
@@ -344,15 +360,11 @@ local function process_body(doc)
     -- needed, provided auto_remove is on.
     if elem.t == "Para" then
 
-      if elem.content[1] and (utils.equals(elem.content[1],
-        code.latex.indent) or utils.equals(elem.content[1],
-        code.latex.noindent)) then
+      if elem.content[1] and is_indent_cmd(elem.content[1]) then
 
-        if utils.equals(elem.content[1], code.latex.indent) then
-          result:extend(indent_markup('indent', elem))
-        else
-          result:extend(indent_markup('noindent', elem))
-        end
+        local cmd = is_indent_cmd(elem.content[1]) -- 'indent', 'noindent'
+
+        result:extend(indent_markup(cmd, elem))
 
       elseif is_first_element then
 

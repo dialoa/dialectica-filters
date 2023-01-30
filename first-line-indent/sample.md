@@ -2,6 +2,9 @@
 title: "Sample first line indent"
 # Filter options. These are defaults, you will get the same
 # if you don't specify anything. See the README.md for details.
+format:
+  pdf:
+    keep-tex: true
 first-line-indent:
   set-metadata-variable: true
   set-header-includes: true
