@@ -1,6 +1,9 @@
 # Dialectica filters
 
-Pandoc Lua filters created to produce the journal Dialectica.
+Pandoc Lua filters created to produce the journal 
+[Dialectica].
+
+[Dialectica]: https://dialectica.philosophie.ch
 
 This repository collects some Lua filters written to produce the
 open-access version of the journal
