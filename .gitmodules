@@ -1,0 +1,9 @@
+[submodule "indentation"]
+	path = indentation
+	url = http://github.com/dialoa/indentation
+[submodule "columns"]
+	path = columns
+	url = https://github.com/dialoa/columns
+[submodule "statement"]
+	path = statement
+	url = https://github.com/dialoa/statement

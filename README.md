@@ -3,27 +3,24 @@
 Pandoc Lua filters created to produce the journal Dialectica.
 
 This repository collects some Lua filters written to produce the
-open-access version of the journal [Dialectica](https://dialectica.philosophie.ch).
+open-access version of the journal
+[Dialectica](https://dialectica.philosophie.ch).
 
 All filters are under MIT License. See each folder for copyrights.
 
-## Overview
+## List
 
-A couple of bigger filters are in separate repositories:
+* [columns](columns) Multiple columns
+  support
 
-* [columns](https://github.com/jdutant/columns) Multiple columns support in Pandoc's markdown
+* [statement](statement) Statement and theorem support
 
-* [statement](https://github.com/jdutant/statement) Statement support in Pandoc's markdown (IN PROGRESS)
+* [indentation](intentation) First-line indentation (LaTeX and HTML output)
 
-Here you will find:
+* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML ouptut.
 
 * [bib-place](bib-place) Template control of the placement of a
 document's bibliography when using Pandoc `citeproc` . 
-
-* [first-line-indent](first-line-indent) Finer control of Pandoc's
-first-line indent output in HTML and LaTeX. 
-
-* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML ouptut.
 
 * [longtable-to-xtab](longtable-to-xtab) Convert LaTeX
 `longtable` environments into `xtab` environments in Pandoc's LaTeX
