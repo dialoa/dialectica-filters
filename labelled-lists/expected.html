@@ -8,9 +8,6 @@
   <title>Labelled-lists - Custom labelled lists in Pandoc’s markdown</title>
   <style>
     html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -29,13 +26,16 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 1em;
+        padding: 12px;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
+      html {
+        background-color: white;
+      }
       body {
         background-color: transparent;
         color: black;
@@ -85,9 +85,10 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
       font-size: 85%;
       margin: 0;
+      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -149,10 +150,17 @@
     }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -191,7 +199,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -204,7 +212,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -216,7 +224,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
@@ -267,8 +274,7 @@ class="labelled-lists-label">Conclusion)</span> This is the
 conclusion.</p>
 </div>
 <p>In general, the filter will turn a bullet list into a custom label
-list provided that <em>every item starts with a non-empty Span
-element</em>.</p>
+list provided that <em>every item starts with a Span element</em>.</p>
 <ul>
 <li>A Span element is inline text (i.e., not block like a paragraph)
 that optinally has some attributes. The default syntax is
@@ -279,13 +285,11 @@ brackets must be present: <code>[label]</code> won’t work,
 <code>[label]{}</code> will.</li>
 <li>The label can include formatting. <code>[**T1**]{}</code> will
 generate a label with strong emphasis (bold by default).</li>
-<li>For the purposes of this filter, a Span is <em>non-empty</em> if its
-inline text is not empty. Thus <code>[]{}</code> will not work. Numbers
-or other unicode characters work. To generate an empty label, use a
-space or other invisible character, e.g. <code>[ ]   {}</code>.
-<em>Exception</em>: math formulas will work as labels, but if the inline
-text only contains LaTeX code (<code>\textsc{a}</code>) it will be
-treated as empty.</li>
+<li>Label Spans can be empty. Thus <code>[]{}</code> will work, though
+it will be typeset as <code>()</code> unless you change the list
+delimiters to ‘none’.</li>
+<li>Numbers, unicode characters, maths formulas can be used as
+Spans.</li>
 <li>Span elements can also be entered using HTML syntax:
 <code>&lt;span&gt;inline text   &lt;/span&gt;</code>. See [Pandoc
 manual] (https://pandoc.org/MANUAL.html#divs-and-spans) for
@@ -301,7 +305,7 @@ class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">delimiter</span><span class="kw">:</span><span class="at"> )</span></span></code></pre></div>
 <p>Possible values:</p>
 <ul>
-<li><code>''</code> or ‘None’ (empty string) for no delimiter</li>
+<li><code>''</code> or ‘none’ (empty string) for no delimiter</li>
 <li><code>()</code> or <code>(</code> or <code>TwoParens</code> for
 “(Label)” (default)</li>
 <li><code>.</code> or <code>Period</code> for a dot “Label.”</li>
@@ -357,7 +361,8 @@ formatting, in parentheses: (<strong>A1</strong>). A prefix and suffix
 can be specified too: <code>[remember @A1ref and the like]</code> will
 output (remember <strong>A1</strong> and the like).</li>
 <li>The suppressed author style, <code>[-@A1ref]</code>, will be
-processed as normal reference</li>
+processed as normal reference: label with its formatting in
+parentheses.</li>
 </ul>
 <p>You can crossrefer to several custom labels at a time:
 <code>[@A1ref; @A2ref]</code>. But mixing references to a custom label
@@ -430,10 +435,12 @@ class="math inline"><em>p</em><sub>2</sub></span>)</span> math formulas
 as labels.</p>
 </div>
 <h3 id="latex-code">LaTeX code</h3>
-<ul>
-<li><span></span> This list uses</li>
-<li><span></span> latex code as labels.</li>
-</ul>
+<div class="labelled-lists-list">
+<p class="labelled-lists-item"><span
+class="labelled-lists-label">)</span> This list uses</p>
+<p class="labelled-lists-item"><span
+class="labelled-lists-label">)</span> latex code as labels.</p>
+</div>
 <p>Ignored: these are not treated as labels.</p>
 <h3 id="small-caps">Small caps</h3>
 <div class="labelled-lists-list">

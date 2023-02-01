@@ -5,6 +5,16 @@
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
 @release 0.2
+
+@TODO style the HTML output
+@TODO in HTML, leave the BulletList element as is. 
+      simply turn the Spans into labels, and wrap in a Div. 
+@TODO style the label in all outputs
+@TODO Possible solution: first sytle all labels, leaving 
+    the pandoc.BulletList as is. Then send it to a formatter
+    that wraps it in a Div (html) and adds local CSS style 
+    block if needed, or flattens it in Raw for LaTeX.  
+@TODO use a Div to declare as custom-label list
 ]]
 
 -- # Internal settings
@@ -30,6 +40,33 @@ local html_classes = {
     label = 'labelled-lists-label',
     list = 'labelled-lists-list',
 }
+
+-- Css to be used later
+local Css = [[
+div.labelled-list > ul {
+  list-style-type: none;
+}
+div.labelled-list > ul li {
+/*  border: 1px solid dimgray;*/
+  padding-left: 1em;
+}
+div.labelled-list > ul > li > label:first-child{
+/*  border: 1px solid blue;*/
+  display: inline-block;
+  min-width: 3em; /* 2em + padding on li */
+  margin-left: -3.5em; /* -(2.5em + padding on li) */
+  margin-right: .5em;
+  color: blue;
+}
+div.labelled-list > ul > li > *:first-child > label:first-child{
+/*  border: 1px solid red;*/
+  display: inline-block;
+  min-width: 3em; /* 2em + padding on li */
+  margin-left: -3.5em; /* -(2.5em + padding on li) */
+  margin-right: .5em;
+  color: red;
+}
+]]
 
 -- # Global variable
 
@@ -160,6 +197,7 @@ end
 -- returns a styled label. Default: round brackets
 -- @param label Inlines an item's label as list of inlines
 -- @param delim (optional) a pair of delimiters (list of two strings)
+-- @return pandoc.Inlines label
 function style_label(label, delim)
     if not delim then
         delim = options.delimiter

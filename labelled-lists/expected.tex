@@ -5,16 +5,19 @@
 \documentclass[
 ]{article}
 \usepackage{amsmath,amssymb}
-\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -33,14 +36,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  pdftitle={Labelled-lists - Custom labelled lists in Pandoc's markdown},
-  pdfauthor={Julien Dutant},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -52,7 +47,7 @@
 \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
 \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
 \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
 \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
 \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
 \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
@@ -65,7 +60,7 @@
 \newcommand{\ExtensionTok}[1]{#1}
 \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
 \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
-\newcommand{\ImportTok}[1]{#1}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
 \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
 \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
 \newcommand{\NormalTok}[1]{#1}
@@ -86,6 +81,14 @@
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Labelled-lists - Custom labelled lists in Pandoc's markdown},
+  pdfauthor={Julien Dutant},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
 \title{Labelled-lists - Custom labelled lists in Pandoc's markdown}
 \author{Julien Dutant}
@@ -154,7 +157,7 @@ see the result):
 \end{itemize}
 
 In general, the filter will turn a bullet list into a custom label list
-provided that \emph{every item starts with a non-empty Span element}.
+provided that \emph{every item starts with a Span element}.
 
 \begin{itemize}
 \tightlist
@@ -171,13 +174,11 @@ provided that \emph{every item starts with a non-empty Span element}.
   The label can include formatting. \texttt{{[}**T1**{]}\{\}} will
   generate a label with strong emphasis (bold by default).
 \item
-  For the purposes of this filter, a Span is \emph{non-empty} if its
-  inline text is not empty. Thus \texttt{{[}{]}\{\}} will not work.
-  Numbers or other unicode characters work. To generate an empty label,
-  use a space or other invisible character,
-  e.g.~\texttt{{[}\ {]}\ \ \ \{\}}. \emph{Exception}: math formulas will
-  work as labels, but if the inline text only contains LaTeX code
-  (\texttt{\textbackslash{}textsc\{a\}}) it will be treated as empty.
+  Label Spans can be empty. Thus \texttt{{[}{]}\{\}} will work, though
+  it will be typeset as \texttt{()} unless you change the list
+  delimiters to `none'.
+\item
+  Numbers, unicode characters, maths formulas can be used as Spans.
 \item
   Span elements can also be entered using HTML syntax:
   \texttt{\textless{}span\textgreater{}inline\ text\ \ \ \textless{}/span\textgreater{}}.
@@ -205,7 +206,7 @@ Possible values:
 \begin{itemize}
 \tightlist
 \item
-  \texttt{\textquotesingle{}\textquotesingle{}} or `None' (empty string)
+  \texttt{\textquotesingle{}\textquotesingle{}} or `none' (empty string)
   for no delimiter
 \item
   \texttt{()} or \texttt{(} or \texttt{TwoParens} for ``(Label)''
@@ -287,7 +288,7 @@ The basic syntax is:
   output (remember \textbf{A1} and the like).
 \item
   The suppressed author style, \texttt{{[}-@A1ref{]}}, will be processed
-  as normal reference
+  as normal reference: label with its formatting in parentheses.
 \end{itemize}
 
 You can crossrefer to several custom labels at a time:
@@ -397,10 +398,11 @@ options as a map. Presently the filter has just one option:
 
 \begin{itemize}
 \tightlist
-\item
-  {\textbf{a}} This list uses
-\item
-  {\textbf{b}} latex code as labels.
+
+\item[\textbf{a})] This list uses
+
+\item[\textbf{b})] latex code as labels.
+
 \end{itemize}
 
 Ignored: these are not treated as labels.

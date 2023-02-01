@@ -4,11 +4,15 @@ DIFF ?= diff --strip-trailing-cr -u
 
 test: test_latex test_html
 
-test_html: README.md expected.html labelled-lists.lua
+recreate: expected.tex expected.html 
+
+pdf: output.pdf
+
+test_html: README.md labelled-lists.lua
 	@pandoc -s --lua-filter labelled-lists.lua --to=html $< \
 		| $(DIFF) expected.html -
 
-test_latex: README.md expected.tex labelled-lists.lua
+test_latex: README.md labelled-lists.lua
 	@pandoc -s --lua-filter labelled-lists.lua --to=latex $< \
 		| $(DIFF) expected.tex -
 
@@ -18,6 +22,6 @@ expected.html: README.md labelled-lists.lua
 expected.tex: README.md labelled-lists.lua
 	pandoc -s --lua-filter labelled-lists.lua --output $@ $<
 
-pdf: README.md labelled-lists.lua
-	@pandoc -s --lua-filter labelled-lists.lua --output out.pdf $<
+output.pdf: README.md labelled-lists.lua
+	@pandoc -s --lua-filter labelled-lists.lua --output $@ $<
 

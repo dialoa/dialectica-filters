@@ -289,7 +289,10 @@ Details
 
 ### HTML output
 
-HTML output is a `<div>`. Each item is a `<p>` if it's one block long,
+HTML output is placed in a `<div>`. 
+
+
+*Currently, the list is recreated as a set of paragraphs*. Each item is a `<p>` if it's one block long,
   a `<div>` if longer. The label itself is contained in a `<span>`. 
 
 ```html
@@ -302,6 +305,23 @@ HTML output is a `<div>`. Each item is a `<p>` if it's one block long,
   </div>
 </div>
 ```
+
+**In the future**, we'll output a `<ol>` list within a Div:
+
+```html
+<div class="labelled-lists-list">
+  <ul>
+  <li><span class="labelled-lists-label">(Premise 1) </span>This is the first claim.</li>
+  <li><span class="labelled-lists-label">(Premise 1) </span>This is the first claim.</li>
+  <li>
+    <p><span class="labelled-lists-label">(<strong>Conclusion</strong>)</span> This third item consists of</p>
+    <p>two blocks.</p>
+  </li>
+  </ul>
+</div>
+```
+
+And style it via the CSS (see "Css" global variable in the code). 
 
 ### List structures
 
