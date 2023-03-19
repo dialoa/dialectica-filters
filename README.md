@@ -10,6 +10,7 @@ the journal [Dialectica][].
 [columns]: https://github.com/dialoa/columns
 [first-line-indent]: https://github.com/dialoa/first-line-indent
 [statement]: https://github.com/dialoa/statement
+[recursive-citeproc]: https://github.com/dialoa/recursive-citeproc
 
 All filters are under MIT License. See each folder for copyrights.
 
