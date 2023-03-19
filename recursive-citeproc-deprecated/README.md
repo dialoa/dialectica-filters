@@ -1,6 +1,6 @@
 
 ---
-title: "Recursive-citeproc - Self-citing Pandoc citeproc bibliographies"
+title: "Recursive-citeproc - Self-citing Pandoc citeproc bibliographies DEPRECATED"
 author: "Julien Dutant"
 ---
 
@@ -8,6 +8,11 @@ Recursive-citerpoc
 ==============
 
 Self-citing Pandoc citeproc bibliographies. 
+
+DEPRECATED: for Pandoc 2.19+ and Quarto use the new 
+[recursive-citeproc](https://github.com/dialoa/recursive-citeproc).
+(We plan to merge some of the code here with the new to provide
+backwards compatibility.)
 
 v0.1. Copyright: © 2021 Julien Dutant <julien.dutant@kcl.ac.uk>. 
 Based on an idea by John MacFarlane.
