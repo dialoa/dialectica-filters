@@ -7,3 +7,6 @@
 [submodule "statement"]
 	path = statement
 	url = https://github.com/dialoa/statement
+[submodule "recursive-citeproc"]
+	path = recursive-citeproc
+	url = https://github.com/dialoa/recursive-citeproc
