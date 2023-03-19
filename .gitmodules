@@ -1,6 +1,3 @@
-[submodule "indentation"]
-	path = indentation
-	url = http://github.com/dialoa/indentation
 [submodule "columns"]
 	path = columns
 	url = https://github.com/dialoa/columns
@@ -10,3 +7,6 @@
 [submodule "recursive-citeproc"]
 	path = recursive-citeproc
 	url = https://github.com/dialoa/recursive-citeproc
+[submodule "first-line-indent"]
+	path = first-line-indent
+	url = https://github.com/dialoa/first-line-indent
