@@ -29,18 +29,20 @@ All filters are under MIT License. See each folder for copyrights.
 * [bib-place](bib-place) Template control of the placement of a
 document's bibliography when using Pandoc `citeproc` . 
 
-* [longtable-to-xtab](longtable-to-xtab) Convert LaTeX
-`longtable` environments into `xtab` environments in Pandoc's LaTeX
-output (to be used within columns with the columns filter).
-
 * [not-in-format](not-in-format) Keep part of a document out of selected
 output formats. Included in [pandoc/lua-filters](https://github.com/pandoc/lua-filters).
 
+* [secnumdepth](secnumdepth) Enables the `secnum-depth` variable
+   in formats other than LaTeX. (h/t [tarleb](https://github.com/jgm/pandoc/issues/6459#issuecomment-1112189237))
 
 * [prefix-ids](prefix-ids) Adds a prefix to all `identifiers` within a 
    Pandoc document.
 
 And:
+
+* [longtable-to-xtab](longtable-to-xtab) Convert LaTeX
+`longtable` environments into `xtab` environments in Pandoc's LaTeX
+output (to be used within columns with the columns filter).
 
 * [functions](functions) some functions to be reused across filters.
 
