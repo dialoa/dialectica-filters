@@ -4,11 +4,13 @@ DIFF ?= diff --strip-trailing-cr -u
 
 test: markdown docx
 
-markdown: sections-to-meta.lua sample.md expected.md
+regenerate: expected.md expected-docx.md
+
+markdown: sections-to-meta.lua sample.md
 	@pandoc --standalone --lua-filter sections-to-meta.lua --to=markdown sample.md \
 		| $(DIFF) expected.md -
 
-docx: sections-to-meta.lua docxsample.docx expected-docx.md 
+docx: sections-to-meta.lua docxsample.docx
 	@pandoc --standalone --lua-filter sections-to-meta.lua --to=markdown docxsample.docx \
 		| $(DIFF) expected-docx.md -
 

@@ -2,9 +2,9 @@
 and `keywords` section to metadata
 
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
-@copyright 2021 Julien Dutant
+@copyright 2021-2023 Philosophie.ch
 @license MIT - see LICENSE file for details.
-@release 0.1
+@release 1.1
 ]]
 
 -- # Options
@@ -23,60 +23,6 @@ local fields_and_aliases = {
   reviewof = pandoc.List:new({'reviewof', 'review-of', 'review of'})
 }
 
---- Extract meta from a list of blocks.
-function meta_from_blocklist (blocks)
-  local body_blocks = pandoc.List()
-  -- whether the current block is part of `body`, `abstract` etc 
-  local looking_at = 'body' 
-
-  for _, block in ipairs(blocks) do
-
-    -- Are we starting a new metadata section? 
-    -- if not, store into body text
-    if block.t == 'Header' then
-      local header_str = pandoc.utils.stringify(block.content):lower()
-      local new_metadata_section = false
-      for field,aliases in pairs(fields_and_aliases) do
-        if aliases:find(header_str) then
-            new_metadata_section = true
-            looking_at = field
-            break
-        end
-      end
-      -- if we haven't found a metadata header, it's part of the body
-      if not new_metadata_section then
-        looking_at = "body"
-        body_blocks:insert(block)
-      end
-    -- Horizontal Rule: if we're looking at metadata, stop
-    --  otherwise keep the rule in blocks
-    -- fake horizontal rule: a paragraph with `* * *`
-    elseif block.t == 'HorizontalRule' or 
-      (block.t == 'Para' and pandoc.utils.stringify(block) == '* * *')
-      then
-        if not (looking_at == "body") then
-          looking_at = "body"
-        else
-          body_blocks:insert(block)
-        end
-    -- if looking at metadata: store it
-    elseif looking_at == "abstract" then
-      abstract:insert(block)
-    elseif looking_at == "thanks" then
-      thanks:insert(block)
-    elseif looking_at == "reviewof" then
-      reviewof:insert(block)
-    elseif looking_at == "keywords" then
-       if block.t == "BulletList" then
-        keywords:insert(block)
-       end
-    else
-      body_blocks:insert(block)
-    end
-  end
-
-  return body_blocks
-end
 
 -- Turn list of BulletList elements into
 -- a MetaList of MetaInlines
@@ -95,6 +41,78 @@ function bulletlist_to_metalist (keywords)
   end
 
   return keyword_list
+end
+
+--- Extract meta from a list of blocks.
+function meta_from_blocklist (blocks)
+  local body_blocks = pandoc.List()
+  -- what we're looking at: beginning, abstract etc blocks or body
+  -- once we encounter the first body block we store everything there
+  -- whether we're looking at the beginning, abstract blocks, etc.
+  -- we'll stop as soon as we get to a body block
+  local looking_at = 'beginning' 
+
+  for _, block in ipairs(blocks) do
+
+    -- if we're already in the body store blocks,
+    -- otherwise look for metadata
+
+    if looking_at == 'body' then
+
+      body_blocks:insert(block)
+
+    else
+
+      -- Header: are we starting a new metadata section? 
+      -- if not, switch to body text mode and store
+      if block.t == 'Header' then
+        local header_str = pandoc.utils.stringify(block.content):lower()
+        local new_metadata_section = false
+        for field,aliases in pairs(fields_and_aliases) do
+          if aliases:find(header_str) then
+              new_metadata_section = true
+              looking_at = field
+              break
+          end
+        end
+        -- if we haven't found a metadata header, it's part of the body
+        if not new_metadata_section then
+          looking_at = 'body'
+          body_blocks:insert(block)
+        end
+
+      -- Horizontal rule: switch to body text mode,
+      -- remove the rule
+      elseif block.t == 'HorizontalRule' or 
+        (block.t == 'Para' and pandoc.utils.stringify(block) == '* * *')
+        then
+          looking_at = 'body'
+          
+      -- Looking at metadata: store it
+      elseif looking_at == "abstract" then
+        abstract:insert(block)
+      elseif looking_at == "thanks" then
+        thanks:insert(block)
+      elseif looking_at == "reviewof" then
+        reviewof:insert(block)
+      elseif looking_at == "keywords" then
+        if block.t == "BulletList" then
+          keywords:insert(block)
+        end
+
+      -- Looking at something else: switch to body text mode
+      -- and store
+      else 
+        looking_at = 'body'
+        body_blocks:insert(block)
+
+      end
+
+    end
+
+  end
+
+  return body_blocks
 end
 
 return {{

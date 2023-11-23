@@ -1,10 +1,11 @@
 # Section-to-meta - Lua filter for Pandoc to capture `abstract`, `thanks` and `keywords` sections in the metadata
 
-The pre-render Lua filter for [Pandoc](https://pandoc.org) picks
-up `Abstract`, `Thanks`, `Keywords` sections and places them
-in the corresponding metadata fields.
+The pre-render Lua filter for [Pandoc](https://pandoc.org) allows
+you to enter some metadata fields as sections at the beginning of
+the document. The filter identifies sections with special titles
+and moves them to the document's metadata.
 
-v1.0. Copyright: © 2021 Julien Dutant <julien.dutant@kcl.ac.uk>
+v1.1. Copyright: © 2021-23 Philosophie.ch <www.philosophie.ch>. Written by Julien Dutant <julien.dutant@kcl.ac.uk>
 License:  MIT - see LICENSE file for details.
 
 Description
@@ -22,17 +23,18 @@ document itself. There are two reasons to do this:
   unfamiliar with YAML indentation rules. Allowing them to enter
   these fields in the document itself is easier.
 
-The filter also provide a `reviewof` field intended for book reviews. 
+The filter also provides a `reviewof` field intended for book reviews. 
 
 Usage
 =====
 
-Use level 1 headings to mark out abstract, acknowledgements and keywords:
+Use headings to mark out your abstract, acknowledgments, and keywords:
 
 ```markdown
 ---
 title: My article
 author: Jane E. Doe
+---
 
 # Abstract
 
@@ -56,12 +58,10 @@ I'm grateful to my parents and family.
 The article's body starts (and ends) here.
 ```
 
-* The keyword section must be a bullet point list (each keyword on a 
-  separate line starting with `- ` or `* `. Any other content in that
-  section will be ignored.
-* Metadata section titles are case-insensitive (`Abstract`, `ABSTRACT`
-  and `abstract` all work). Aliases are provided: `Summary` for `Abstract`,
-  `Acknowledgements` and `Acknowledgments` for `thanks`. 
+* The metadata sections must be at the beginning of the document. 
+  The document's body will start wherever the filter encounters a
+  horizontal line or a header whose title isn't one of "Abstract" etc. Headers titled "Summary" or the like lower in the document
+  will be treated as ordinary document sections. 
 * If you don't have a heading (`# Introduction`) to separate the 
   abstract/thanks/keywords from the rest of the text, use a 
   [horizontal rule](#https://pandoc.org/MANUAL.html#horizontal-rules).
@@ -69,8 +69,13 @@ The article's body starts (and ends) here.
   otherwise the text above is read as a heading.
   In source formats whose horizontal rules are
   not recognized as such by Pandoc (e.g. MS Word), you can still achieve the
-  same effect by using an separate paragraph containing only `* * *`. 
+  same effect by using a separate paragraph containing only `* * *`. 
+* The keyword section must be a bullet point list. 
+  Any other content in that section will be ignored.
+* Metadata section titles are case-insensitive (`Abstract`, `ABSTRACT`
+  and `abstract` all work). Aliases are provided: `Summary` for `Abstract`,
+  `Acknowledgements` and `Acknowledgments` for `thanks`. 
 * The `abstract`, `keywords` and `thanks` headings can be of any level.
-  They will end at the next header, so your document's headers can be 
-  of level 2 or lower if you wish (`## Introduction` will work just
-  as well to terminate the abstract/thanks/keywords). 
+  They will end at the next header, whichever level it is. Thus your document's headers can be 
+  of level 2 or lower if you wish: `## Introduction` works just
+  as well to terminate the abstract/thanks/keywords. 

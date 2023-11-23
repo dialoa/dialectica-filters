@@ -5,15 +5,13 @@ keywords:
 - Lua filter
 - Pandoc
 - Metadata
+reviewof: |
+  [Doe]{.smallcaps}, Jane, *Last but not least*, Fancy Press, 2018, 320
+  pp.
 thanks: |
   I would like to thank *many* people. Apologies to anyone I forgot.
 title: Sample sections-to-meta document
 ---
-
-# Review of
-
-[Doe]{.smallcaps}, Jane, *Last but not least*, Fancy Press, 2018, 320
-pp.
 
 # The sections-to-meta document
 
