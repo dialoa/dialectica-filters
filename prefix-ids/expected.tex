@@ -1,55 +1,49 @@
-\hypertarget{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}{%
-\section{Introduction}\label{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}}
+\section{Introduction}\label{sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro}
 
-\protect\hypertarget{9210402039f6de27e109aad91536dbb424f40b80ref}{}{This
+\phantomsection\label{61879b5e0ffe4fbb0cb6788aa8462db5f9c333dbref}{This
 span's id} is changed.
-This\protect\hyperlink{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro}{introduction}
-link, or again \protect\hyperlink{introduction}{as a full-blown link} is
-changed. We handle citations too (Watson and Crick 1953).
+This\hyperref[sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro]{introduction}
+link, or again \hyperref[introduction]{as a full-blown link} is changed.
+We handle citations too (Watson and Crick 1953).
 
 \begin{figure}
-\hypertarget{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image}{%
 \centering
 \includegraphics{file.ext}
-\caption{Caption}\label{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image}
-}
+\caption{Caption}\label{fig:image}
 \end{figure}
 
-\begin{equation}\protect\hypertarget{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}{}{x + 2}\label{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}\end{equation}
+\begin{equation}\phantomsection\label{eq:c1ead31cf7bd1baf542d29db26d8194fbb7a9472myeq}{x + 2}\end{equation}
 
 Pandoc-crossref references:
-sec.~\ref{sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro},
-fig.~\ref{fig:f887301f60b72d82855d02cfc36678bb952ce2b3image},
-eq.~\ref{eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq}.
+sec.~\ref{sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro},
+fig.~\ref{fig:image},
+eq.~\ref{eq:c1ead31cf7bd1baf542d29db26d8194fbb7a9472myeq}.
 
-\hypertarget{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label}{}
 \begin{longtable}[]{@{}lll@{}}
-\caption{\label{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label}Caption}\tabularnewline
-\toprule
+\caption{\label{tbl:c1ead31cf7bd1baf542d29db26d8194fbb7a9472label}Caption}\tabularnewline
+\toprule\noalign{}
 a & b & c \\
-\midrule
+\midrule\noalign{}
 \endfirsthead
-\toprule
+\toprule\noalign{}
 a & b & c \\
-\midrule
+\midrule\noalign{}
 \endhead
+\bottomrule\noalign{}
+\endlastfoot
 1 & 2 & 3 \\
 4 & 5 & 6 \\
-\bottomrule
 \end{longtable}
 
-\hypertarget{9210402039f6de27e109aad91536dbb424f40b80f887301f60b72d82855d02cfc36678bb952ce2b3code-blocks}{%
 \section{Code
-blocks}\label{9210402039f6de27e109aad91536dbb424f40b80f887301f60b72d82855d02cfc36678bb952ce2b3code-blocks}}
+blocks}\label{61879b5e0ffe4fbb0cb6788aa8462db5f9c333dbc1ead31cf7bd1baf542d29db26d8194fbb7a9472code-blocks}
 
 Can be numbered:
 
 \begin{codelisting}
 
-\caption{Listing caption}
+\caption{Listing caption}\label{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472numberedcode}
 
-\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode}{%
-\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode}}%
 \begin{Shaded}
 \begin{Highlighting}[]
 \OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
@@ -63,10 +57,9 @@ Or use table syntax to get captions, with label as an id attribute:
 
 \begin{codelisting}
 
-\caption{Listing caption}
+\caption{Listing
+caption}\label{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472mycode}
 
-\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}{%
-\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}}%
 \begin{Shaded}
 \begin{Highlighting}[]
 \OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
@@ -80,10 +73,9 @@ Or with label specified in the caption:
 
 \begin{codelisting}
 
-\caption{Listing caption}
+\caption{Listing
+caption}\label{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472code}
 
-\hypertarget{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code}{%
-\label{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code}}%
 \begin{Shaded}
 \begin{Highlighting}[]
 \OtherTok{main ::} \DataTypeTok{IO}\NormalTok{ ()}
@@ -93,14 +85,14 @@ Or with label specified in the caption:
 
 \end{codelisting}
 
-See tbl.~\ref{tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label} or
-lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode} or
-lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3code} or
-lst.~\ref{lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode}.
+See tbl.~\ref{tbl:c1ead31cf7bd1baf542d29db26d8194fbb7a9472label} or
+lst.~\ref{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472numberedcode} or
+lst.~\ref{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472code} or
+lst.~\ref{lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472mycode}.
 
-\hypertarget{9210402039f6de27e109aad91536dbb424f40b80refs}{}
+\phantomsection\label{61879b5e0ffe4fbb0cb6788aa8462db5f9c333dbrefs}
 \begin{CSLReferences}{1}{0}
-\leavevmode\vadjust pre{\hypertarget{9210402039f6de27e109aad91536dbb424f40b80ref-WatsonCrick1953}{}}%
+\bibitem[\citeproctext]{ref-61879b5e0ffe4fbb0cb6788aa8462db5f9c333dbWatsonCrick1953}
 Watson, J. D., and F. H. C. Crick. 1953. {``Molecular Structure of
 Nucleic Acids: A Structure for Deoxyribose Nucleic Acid.''}
 \emph{Nature} 171 (4356): 737--38.

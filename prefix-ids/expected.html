@@ -1,24 +1,22 @@
 <h1
-id="sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro">Introduction</h1>
-<p><span id="a6e9b0ba3ada1a55c91ff2b41ac4bf977b46310aref">This span’s
+id="sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro">Introduction</h1>
+<p><span id="20bfd9ff0959db054a5043390eab269866ed0a57ref">This span’s
 id</span> is changed. This<a
-href="#sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro">introduction</a>
+href="#sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro">introduction</a>
 link, or again <a href="#introduction">as a full-blown link</a> is
 changed. We handle citations too <span class="citation"
 data-cites="WatsonCrick1953">(Watson and Crick 1953)</span>.</p>
-<figure>
-<img src="file.ext"
-id="fig:f887301f60b72d82855d02cfc36678bb952ce2b3image"
-alt="Figure 1: Caption" />
-<figcaption aria-hidden="true">Figure 1: Caption</figcaption>
+<figure id="fig:image">
+<embed src="file.ext" />
+<figcaption>Figure 1: Caption</figcaption>
 </figure>
-<p><span id="eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq"><span
+<p><span id="eq:c1ead31cf7bd1baf542d29db26d8194fbb7a9472myeq"><span
 class="math display"><em>x</em> + 2   (1)</span></span></p>
 <p>Pandoc-crossref references: sec. <a
-href="#sec:f887301f60b72d82855d02cfc36678bb952ce2b3intro">1</a>, fig. <a
-href="#fig:f887301f60b72d82855d02cfc36678bb952ce2b3image">1</a>, eq. <a
-href="#eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq">1</a>.</p>
-<div id="tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label">
+href="#sec:c1ead31cf7bd1baf542d29db26d8194fbb7a9472intro">1</a>, fig. <a
+href="#fig:image">1</a>, eq. <a
+href="#eq:c1ead31cf7bd1baf542d29db26d8194fbb7a9472myeq">1</a>.</p>
+<div id="tbl:c1ead31cf7bd1baf542d29db26d8194fbb7a9472label">
 <table>
 <caption>Table 1: Caption</caption>
 <thead>
@@ -43,10 +41,10 @@ href="#eq:f887301f60b72d82855d02cfc36678bb952ce2b3myeq">1</a>.</p>
 </table>
 </div>
 <h1
-id="a6e9b0ba3ada1a55c91ff2b41ac4bf977b46310af887301f60b72d82855d02cfc36678bb952ce2b3code-blocks">Code
+id="20bfd9ff0959db054a5043390eab269866ed0a57c1ead31cf7bd1baf542d29db26d8194fbb7a9472code-blocks">Code
 blocks</h1>
 <p>Can be numbered:</p>
-<div id="lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode"
+<div id="lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472numberedcode"
 class="listing haskell">
 <p>Listing 1: Listing caption</p>
 <div class="sourceCode" id="cb1"><pre
@@ -55,7 +53,7 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a 
 </div>
 <p>Or use table syntax to get captions, with label as an id
 attribute:</p>
-<div id="lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode"
+<div id="lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472mycode"
 class="listing haskell">
 <p>Listing 2: Listing caption</p>
 <div class="sourceCode" id="cb2"><pre
@@ -63,7 +61,7 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a 
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World!&quot;</span></span></code></pre></div>
 </div>
 <p>Or with label specified in the caption:</p>
-<div id="lst:f887301f60b72d82855d02cfc36678bb952ce2b3code"
+<div id="lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472code"
 class="listing haskell">
 <p>Listing 3: Listing caption</p>
 <div class="sourceCode" id="cb3"><pre
@@ -71,17 +69,18 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a 
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World!&quot;</span></span></code></pre></div>
 </div>
 <p>See tbl. <a
-href="#tbl:f887301f60b72d82855d02cfc36678bb952ce2b3label">1</a> or
+href="#tbl:c1ead31cf7bd1baf542d29db26d8194fbb7a9472label">1</a> or
 lst. <a
-href="#lst:f887301f60b72d82855d02cfc36678bb952ce2b3numberedcode">1</a>
+href="#lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472numberedcode">1</a>
 or lst. <a
-href="#lst:f887301f60b72d82855d02cfc36678bb952ce2b3code">3</a> or
+href="#lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472code">3</a> or
 lst. <a
-href="#lst:f887301f60b72d82855d02cfc36678bb952ce2b3mycode">2</a>.</p>
-<div id="a6e9b0ba3ada1a55c91ff2b41ac4bf977b46310arefs"
-class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="a6e9b0ba3ada1a55c91ff2b41ac4bf977b46310aref-WatsonCrick1953"
-class="csl-entry" role="doc-biblioentry">
+href="#lst:c1ead31cf7bd1baf542d29db26d8194fbb7a9472mycode">2</a>.</p>
+<div id="20bfd9ff0959db054a5043390eab269866ed0a57refs"
+class="references csl-bib-body hanging-indent" data-entry-spacing="0"
+role="list">
+<div id="ref-20bfd9ff0959db054a5043390eab269866ed0a57WatsonCrick1953"
+class="csl-entry" role="listitem">
 Watson, J. D., and F. H. C. Crick. 1953. <span>“Molecular Structure of
 Nucleic Acids: A Structure for Deoxyribose Nucleic Acid.”</span>
 <em>Nature</em> 171 (4356): 737–38. <a

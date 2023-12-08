@@ -4,14 +4,23 @@ and links in a Pandoc document
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
 @copyright 2021 Julien Dutant
 @license MIT - see LICENSE file for details.
-@release 0.2
+@release 0.3
+
 ]]
 
 -- # Global variables
-local prefix = '' -- user's custom prefix
-local old_identifiers = pandoc.List:new() -- identifiers removed
-local new_identifiers = pandoc.List:new() -- identifiers added
-local pandoc_crossref = true -- do we process pandoc-crossref links?
+
+---@type string user's custom prefix
+local prefix = ''
+---@type pandoc.List identifers removed
+local old_identifiers = pandoc.List:new()
+---@type pandoc.List identifers added
+local new_identifiers = pandoc.List:new()
+---@type pandoc.List identifiers to ignore
+local ids_to_ignore = pandoc.List:new()
+---@type boolean whether to process pandoc-crossref links
+local pandoc_crossref = true
+
 local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst',
         'Fig','Sec','Eq','Tbl','Lst'})
 local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst',
@@ -76,7 +85,7 @@ function get_options(meta)
 end
 
 --- process_doc: process the pandoc document
--- generates a prefix is needed, walk through the document
+-- generates a prefix if needed, walk through the document
 -- and adds a prefix to all elements with identifier.
 -- @param pandoc Pandoc element
 -- @TODO handle meta fields that may contain identifiers? abstract

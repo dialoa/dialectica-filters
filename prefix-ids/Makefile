@@ -1,25 +1,32 @@
 DIFF ?= diff --strip-trailing-cr -u
 
+FILTERS:= crossref-prefix.lua prefix-ids.lua
+PANDOC ?= pandoc
+
 .PHONY: test
+test: test-html test-tex
 
-test: html tex
+.PHONY: generate
+generate: expected.html expected.tex
 
-html: crossref-prefix.lua prefix-ids.lua sample.md expected.html
-	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+.PHONY:test-html
+test-html: sample.md $(FILTERS)
+	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
 	--to=html | $(DIFF) expected.html -
 
-tex: crossref-prefix.lua prefix-ids.lua sample.md expected.tex
-	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+.PHONY:test-tex
+test-tex: sample.md $(FILTERS)
+	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
 	--to=latex | $(DIFF) expected.tex -
 
-expected.html: crossref-prefix.lua prefix-ids.lua sample.md
-	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+expected.html: sample.md $(FILTERS)
+	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
 	--output expected.html
 
-expected.tex: crossref-prefix.lua prefix-ids.lua sample.md
-	@pandoc -L crossref-prefix.lua -F pandoc-crossref \
+expected.tex: sample.md $(FILTERS)
+	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
 	--output expected.tex

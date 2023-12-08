@@ -1,36 +1,54 @@
 --[[-- # Prefix-ids - Prefixings all ids in a Pandoc document
 
 @author Julien Dutant <julien.dutant@kcl.ac.uk>
-@copyright 2021 Julien Dutant
+@copyright 2021-2023 Philosophie.ch
 @license MIT - see LICENSE file for details.
-@release 0.2
+@release 0.3
+
+BUG: 
+    citeproc needs Div ids "ref-..." in the reference sections.
+
 ]]
 
--- # Global variables
-local prefix = '' -- user's custom prefix
-local old_identifiers = pandoc.List:new() -- identifiers removed
-local ids_to_ignore = pandoc.List:new() -- identifiers to ignore
-local pandoc_crossref = true -- do we process pandoc-crossref links?
-local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
-local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst'}) -- in Str elements
-local codeblock_captions = true -- is the codeblock caption syntax on?
+---# Global variables
 
---- type: pandoc-friendly type function
--- pandoc.utils.type is only defined in Pandoc >= 2.17
--- if it isn't, we extend Lua's type function to give the same values
--- as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
--- string and booleans
--- Caution: not to be used on non-Meta Pandoc elements, the 
--- results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
--- >=2.17, the .t string in <2.17).
+---@alias crossref.Prefixes 'fig'|'sec'|'eq'|'tbl'|'lst'
+---@alias citeproc.Prefixes 'ref'
+
+---@type string user's custom prefix
+local prefix = ''
+---@type pandoc.List identifers removed
+local old_identifiers = pandoc.List:new()
+---@type pandoc.List identifiers to ignore
+local ids_to_ignore = pandoc.List:new()
+---@type boolean whether to process pandoc-crossref links
+local pandoc_crossref = true
+---@type pandoc.List list of identifier prefixes for crossref
+local crossref_prefixes = pandoc.List:new({'fig','sec','eq','tbl','lst'})
+---@type pandoc.List list of identifier prefixes for citeproc
+local citeproc_prefixes = pandoc.List:new({'ref'})
+---@type pandoc.List list of identifier prefixes appearing in Str elements
+local crossref_str_prefixes = pandoc.List:new({'eq','tbl','lst'})
+---@type boolean whether pandoc-cross ref codeBlockCaptions option is on
+local codeblock_captions = true
+
+---type: pandoc-friendly type function
+---pandoc.utils.type is only defined in Pandoc >= 2.17
+---if it isn't, we extend Lua's type function to give the same values
+---as pandoc.utils.type on Meta objects: Inlines, Inline, Blocks, Block,
+---string and booleans
+---Caution: not to be used on non-Meta Pandoc elements, the 
+---results will differ (only 'Block', 'Blocks', 'Inline', 'Inlines' in
+--->=2.17, the .t string in <2.17).
 local type = pandoc.utils.type or function (obj)
         local tag = type(obj) == 'table' and obj.t and obj.t:gsub('^Meta', '')
         return tag and tag ~= 'Map' and tag or type(obj)
     end
 
 
---- get_options: get filter options for document's metadata
--- @param meta pandoc Meta element
+---get_options: get filter options for document's metadata
+---@param meta pandoc.Meta
+---@return pandoc.Meta
 function get_options(meta)
 
     -- syntactic sugar: options aliases
@@ -64,6 +82,7 @@ function get_options(meta)
         
     end
 
+    -- pandoc-crossref option: meta.codeBlockCaptions 
     -- if meta.codeBlockCaptions is false then we should *not*
     -- process `lst:label` identifiers that appear in Str elements
     -- (that is, in codeblock captions). We will still convert
@@ -77,12 +96,12 @@ function get_options(meta)
     return meta
 end
 
---- process_doc: process the pandoc document
--- generates a prefix is needed, walk through the document
--- and adds a prefix to all elements with identifier.
--- @param pandoc Pandoc element
--- @TODO handle meta fields that may contain identifiers? abstract
--- and thanks?
+---process_doc: process the pandoc document. 
+---generates a prefix if needed, walks through the document
+---and adds a prefix to all elements with identifier.
+---@TODO meta fields may contain identifiers? abstract, thanks
+---@param doc pandoc.Doc
+---@return pandoc.Doc
 function process_doc(doc)
 
     -- generate prefix if needed
@@ -92,11 +111,18 @@ function process_doc(doc)
 
     -- add_prefix function
     -- do not add prefixes to empty identifiers
-    -- store the old identifiers for fixing the links
+    -- store the old identifiers in order to fix links
     add_prefix = function (el) 
         if el.identifier and el.identifier ~= '' 
             and not ids_to_ignore:find(el.identifier) then
-            -- if pandoc-crossref type, we add the prefix after "fig:", "tbl", ...
+            -- if citeproc type, add the prefix after "ref-"
+            local type, identifier = el.identifier:match('^(%a+)%-(.*)')
+            if type and identifier and citeproc_prefixes:find(type) then
+                old_identifiers:insert(el.identifier)
+                el.identifier =  type..'-'..prefix..identifier
+                return el
+            end            
+            -- if pandoc-crossref type, we add the prefix after "fig:", "tbl:", ...
             -- though (like pandoc-crossref) we must ignore #lst:label unless there's 
             -- a caption attribute or the codeblock caption syntax is on
             if pandoc_crossref then
@@ -116,8 +142,8 @@ function process_doc(doc)
                     -- after, but that requires going through the doc
                     -- el by el, not worth it. 
                     else
-                        old_identifiers:insert(type .. ':' .. identifier)
-                        el.identifier =  type .. ':' .. prefix .. identifier
+                        old_identifiers:insert(el.identifier)
+                        el.identifier =  type..':'..prefix..identifier
                         return el
                     end
                 end
@@ -198,7 +224,7 @@ function process_doc(doc)
     end
     -- function to add prefixes to pandoc-crossref citations
     -- looking for keys starting with `fig:`, `sec:`, `eq:`, ... 
-    local add_prefix_to_crossref_cites = function (cite)
+    add_prefix_to_crossref_cites = function (cite)
         for i = 1, #cite.citations do
             local type, identifier = cite.citations[i].id:match('^(%a+):(.*)')
             if type and identifier and crossref_prefixes:find(type) then
@@ -216,7 +242,7 @@ function process_doc(doc)
         return cite
     end
     -- function to process links and cites in some blocks
-    process_links = function(blocks) 
+    local process_links = function(blocks) 
         local div = pandoc.walk_block(pandoc.Div(blocks), {
             Link = add_prefix_to_link,
             Cite = pandoc_crossref and add_prefix_to_crossref_cites
