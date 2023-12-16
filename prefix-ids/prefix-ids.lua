@@ -104,12 +104,8 @@ end
 ---@return pandoc.Doc
 function process_doc(doc)
 
-    -- generate prefix if needed
-    if prefix == '' then
-        prefix = pandoc.utils.sha1(pandoc.utils.stringify(doc.blocks))
-    end
-
     -- add_prefix function
+    -- adds prefix to an identifier
     -- do not add prefixes to empty identifiers
     -- store the old identifiers in order to fix links
     add_prefix = function (el) 
@@ -184,31 +180,17 @@ function process_doc(doc)
         return div.content
     end
 
-    -- prefix identifiers in doc and in metadata fields with blocks content
-    for key,val in pairs(doc.meta) do
-        if type(val) == 'Blocks' then
-          doc.meta[key] = pandoc.MetaBlocks(
-                        process_identifiers(pandoc.List(val))
-                    )
-        elseif type(val) == 'List' then
-            for i = 1, #val do
-                if type(val[i]) == 'Blocks' then
-                    doc.meta[key][i] = pandoc.MetaBlocks(
-                        process_identifiers(pandoc.List(val[i]))
-                    )
-                end
-            end
-        end
-    end
-    doc.blocks = process_identifiers(doc.blocks)
-
     -- function to add prefixes to links
     local add_prefix_to_link = function (link)
         if link.target:sub(1,1) == '#' 
           and old_identifiers:find(link.target:sub(2,-1)) then
             local target = link.target:sub(2,-1)
+            -- handle citeproc targets 
+            local type, identifier = target:match('^(%a+)%-(.*)')
+            if type and identifier and citeproc_prefixes:find(type) then
+                target = '#'..type..'-'..prefix..identifier
             -- handle pandoc-crossref types targets if needed
-            if pandoc_crossref then
+            elseif pandoc_crossref then
                 local type, identifier = target:match('^(%a+):(.*)')
                 if type and crossref_prefixes:find(type) then
                     target = '#' .. type .. ':' .. prefix .. identifier
@@ -250,7 +232,32 @@ function process_doc(doc)
         return div.content
     end
 
-    -- process links and cites in doc and in metablocks fields
+    -- MAIN BODY
+    -- generate prefix if needed
+    if prefix == '' then
+        prefix = pandoc.utils.sha1(pandoc.utils.stringify(doc.blocks))
+    end    
+
+    -- prefix identifiers in doc and in metadata fields with blocks content
+    for key,val in pairs(doc.meta) do
+        if type(val) == 'Blocks' then
+            doc.meta[key] = pandoc.MetaBlocks(
+                        process_identifiers(pandoc.List(val))
+                    )
+        elseif type(val) == 'List' then
+            for i = 1, #val do
+                if type(val[i]) == 'Blocks' then
+                    doc.meta[key][i] = pandoc.MetaBlocks(
+                        process_identifiers(pandoc.List(val[i]))
+                    )
+                end
+            end
+        end
+    end
+    doc.blocks = process_identifiers(doc.blocks)
+    
+    
+    -- process links and cites in metadata fields and in body
     for key,val in pairs(doc.meta) do
         if type(val) == 'Blocks' then
           doc.meta[key] = pandoc.MetaBlocks(
