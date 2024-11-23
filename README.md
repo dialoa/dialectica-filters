@@ -38,7 +38,7 @@ And:
 
 * [longtable-to-xtab](longtable-to-xtab) Convert LaTeX
 `longtable` environments into `xtab` environments in Pandoc's LaTeX
-output (to be used within columns with the columns filter).
+output. (Project for an enhancement of the columns filter).
 
 * [functions](functions) some functions to be reused across filters.
 
