@@ -10,3 +10,6 @@
 [submodule "first-line-indent"]
 	path = first-line-indent
 	url = https://github.com/dialoa/first-line-indent
+[submodule "imagify"]
+	path = imagify
+	url = https://github.com/dialoa/imagify

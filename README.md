@@ -6,12 +6,6 @@ Pandoc Lua filters created to produce the journal
 This repository collects some Lua filters written to produce 
 the journal [Dialectica][].
 
-[Dialectica]: https://dialectica.philosophie.ch
-[columns]: https://github.com/dialoa/columns
-[first-line-indent]: https://github.com/dialoa/first-line-indent
-[statement]: https://github.com/dialoa/statement
-[recursive-citeproc]: https://github.com/dialoa/recursive-citeproc
-
 All filters are under MIT License. See each folder for copyrights.
 
 ## List
@@ -19,6 +13,8 @@ All filters are under MIT License. See each folder for copyrights.
 * [columns][] Multiple columns support
 
 * [statement][] Statement and theorem support
+
+* [imagify][] Imagify LaTeX elements for HTML output
 
 * [first-line-indent][] First-line indentation (LaTeX and HTML output) (Quarto / Pandoc)
 
@@ -50,3 +46,10 @@ output (to be used within columns with the columns filter).
 
 PR welcome. 
 
+
+[Dialectica]: https://dialectica.philosophie.ch
+[columns]: https://github.com/dialoa/columns
+[imagify]: https://github.com/dialoa/imagify
+[first-line-indent]: https://github.com/dialoa/first-line-indent
+[statement]: https://github.com/dialoa/statement
+[recursive-citeproc]: https://github.com/dialoa/recursive-citeproc
