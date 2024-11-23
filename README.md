@@ -20,7 +20,7 @@ All filters are under MIT License. See each folder for copyrights.
 
 * [recursive-citeproc][] Handle self-citing bibliographies (Quarto / Pandoc)
 
-* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML ouptut.
+* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML output.
 
 * [bib-place](bib-place) Template control of the placement of a
 document's bibliography when using Pandoc `citeproc` . 
