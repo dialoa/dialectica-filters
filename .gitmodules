@@ -13,3 +13,6 @@
 [submodule "imagify"]
 	path = imagify
 	url = https://github.com/dialoa/imagify
+[submodule "labelled-lists"]
+	path = labelled-lists
+	url = https://github.com/dialoa/labelled-lists
