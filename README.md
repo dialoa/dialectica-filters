@@ -10,17 +10,17 @@ All filters are under MIT License. See each folder for copyrights.
 
 ## List
 
-* [columns][] Multiple columns support
+* [columns] Multiple columns support
 
-* [statement][] Statement and theorem support
+* [statement] Statement and theorem support
 
-* [imagify][] Imagify LaTeX elements for HTML output
+* [imagify] Imagify LaTeX elements for HTML output
 
-* [first-line-indent][] First-line indentation (LaTeX and HTML output) (Quarto / Pandoc)
+* [labelled-lists] Custom labelled lists in LaTeX and HTML output.
 
-* [recursive-citeproc][] Handle self-citing bibliographies (Quarto / Pandoc)
+* [first-line-indent] First-line indentation (LaTeX and HTML output) (Quarto / Pandoc)
 
-* [labelled-lists](labelled-lists) Custom labelled lists in LaTeX and HTML output.
+* [recursive-citeproc] Handle self-citing bibliographies (Quarto / Pandoc)
 
 * [bib-place](bib-place) Template control of the placement of a
 document's bibliography when using Pandoc `citeproc` . 
@@ -48,8 +48,9 @@ PR welcome.
 
 
 [Dialectica]: https://dialectica.philosophie.ch
+[statement]: https://github.com/dialoa/statement
 [columns]: https://github.com/dialoa/columns
 [imagify]: https://github.com/dialoa/imagify
+[labelled-lists]: https://github.com/dialoa/labelled-lists
 [first-line-indent]: https://github.com/dialoa/first-line-indent
-[statement]: https://github.com/dialoa/statement
 [recursive-citeproc]: https://github.com/dialoa/recursive-citeproc
