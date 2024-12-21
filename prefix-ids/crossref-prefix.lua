@@ -163,10 +163,13 @@ function process_doc(doc)
     -- elements with pandoc-crossref identifiers
     process_identifiers = function(blocks)
         local div = pandoc.walk_block(pandoc.Div(blocks), {
-            Image = add_prefix,
+            CodeBlock = add_prefix,
+            Figure = add_prefix,
             Header = add_prefix,
             Table = add_prefix,
-            CodeBlock = add_prefix,
+            Code = add_prefix,
+            Image = add_prefix,
+            --Link = add_prefix, REMOVED css writers might not expect it
             Str = add_prefix_string,
         })
         return div.content

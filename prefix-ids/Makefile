@@ -9,13 +9,13 @@ test: test-html test-tex
 .PHONY: generate
 generate: expected.html expected.tex
 
-.PHONY:test-html
+.PHONY: test-html
 test-html: sample.md $(FILTERS)
 	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
 	--to=html | $(DIFF) expected.html -
 
-.PHONY:test-tex
+.PHONY: test-tex
 test-tex: sample.md $(FILTERS)
 	@$(PANDOC) -L crossref-prefix.lua -F pandoc-crossref \
 	--citeproc -L prefix-ids.lua sample.md \
