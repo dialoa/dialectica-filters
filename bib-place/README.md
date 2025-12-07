@@ -100,9 +100,16 @@ premable, use a Div with id `refs-preamble`:
 
 This should come before references.
 
+\
+
 :::
 
 ```
+
+Typically, you need to add a blank line to separate your 
+preamble from references. This is done above with an paragraph
+only containing an escaped end of line: `\` on a line of its
+one (directly followed by a linebreak, no space).
 
 Notes
 -----

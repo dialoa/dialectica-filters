@@ -10,8 +10,6 @@
 -- @license MIT - see LICENSE file for details.
 -- @release 0.1
 
-local references = pandoc.List({})
-
 --- Filter for the document's blocks
 --Scan body from last block backwards, look for the `refs` Div,
 --If present, check the element right before and pick
@@ -19,60 +17,49 @@ local references = pandoc.List({})
 --The `refs-preamble` Div is dissolved.
 -- @param element a Div element
 -- @return an empty list if Div has identifier `refs`
-local blocks_filter = {
+Pandoc = function (doc)
 
-  Pandoc = function (doc)
+  local preamble = pandoc.List:new()
+  local references = pandoc.List:new()
 
-    local previous_was_refs = false
+  local previous_was_refs = false
 
-    for i = #doc.blocks, 1, -1 do
+  for i = #doc.blocks, 1, -1 do
 
-      if previous_was_refs then
-        if doc.blocks[i].t == 'Header' then
-          references:insert(1, pandoc.MetaBlocks( { doc.blocks[i] } ))
-          doc.blocks:remove(i)
-          break
-        elseif doc.blocks[i].t == 'Div' and 
-          doc.blocks[i].identifier == 'refs-preamble' then
-            references:extend(pandoc.MetaBlocks( doc.blocks[i].content ))
-            doc.blocks:remove(i)
-        else
-          break
-        end
+    if previous_was_refs then
+      if doc.blocks[i].t == 'Header' then
 
-      elseif doc.blocks[i].identifier == 'refs'
-          or ( doc.blocks[i].classes and
-            doc.blocks[i].classes:includes('csl-bib-body') ) then
+        preamble = pandoc.MetaBlocks( { doc.blocks[i] } )
+        doc.blocks:remove(i)
+        break
 
-        references:insert(pandoc.MetaBlocks( { doc.blocks[i] } ))
-        doc.blocks:remove(i) -- remove the Div
-        previous_was_refs = true
+      elseif doc.blocks[i].t == 'Div' and 
+      doc.blocks[i].identifier == 'refs-preamble' then
+
+        preamble = pandoc.MetaBlocks({doc.blocks[i]})
+        doc.blocks:remove(i)
+        break
+
+      else
+
+        break
 
       end
 
+    elseif doc.blocks[i].identifier == 'refs'
+    or ( doc.blocks[i].classes and
+    doc.blocks[i].classes:includes('csl-bib-body') ) then
+
+      references = pandoc.MetaBlocks( { doc.blocks[i] } )
+      doc.blocks:remove(i) -- remove the Div
+      previous_was_refs = true
+
     end
 
-    return(doc)
-
   end
-}
 
---- Metadata filter.
--- Places the references block (as string) in the `references`
--- field of the document's metadata. The template can
--- print it by using `$meta.references$`.
--- @param meta the document's metadata block
--- @return the modified metadata block
-local metadata_filter = {
-  Meta = function (meta)
-    meta.referencesblock = references
-    return meta
-  end
-}
+  doc.meta.referencesblock = preamble:extend(references)
 
---- Main code
--- Returns the filters in the desired order of execution
-return {
-  blocks_filter,
-  metadata_filter
-}
+  return(doc)
+
+end

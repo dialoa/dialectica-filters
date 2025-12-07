@@ -5,7 +5,15 @@ institute: School of Studies
 bibliography: sample.bib
 ...
 
-I enjoyed @Doe.
+I enjoyed @Doe.[^1]
+
+::: {#refs-preamble}
 
 ## Works cited
 
+This should come before references.
+
+:::
+
+
+[^1]: dummy stuff
