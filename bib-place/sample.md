@@ -7,5 +7,5 @@ bibliography: sample.bib
 
 I enjoyed @Doe.
 
-## Works cited {.refs}
+## Works cited
 

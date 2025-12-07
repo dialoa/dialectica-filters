@@ -13,11 +13,10 @@
 local references = pandoc.List({})
 
 --- Filter for the document's blocks
--- Extract the Div with identifer 'refs' if present, as well as
--- any heading that immediately precedes it, and stores them in
--- the variable `references`. To find a heading that precedes
--- the `refs` Div we need to walk through the document
--- backwards, element by element.
+--Scan body from last block backwards, look for the `refs` Div,
+--If present, check the element right before and pick
+--it up if it's a header or a `refs-preamble` Div.
+--The `refs-preamble` Div is dissolved.
 -- @param element a Div element
 -- @return an empty list if Div has identifier `refs`
 local blocks_filter = {
@@ -28,13 +27,15 @@ local blocks_filter = {
 
     for i = #doc.blocks, 1, -1 do
 
-      -- if we have already found the Div `refs` we check
-      --  whether we have a heading and end the loop
       if previous_was_refs then
         if doc.blocks[i].t == 'Header' then
           references:insert(1, pandoc.MetaBlocks( { doc.blocks[i] } ))
-          doc.blocks:remove(i) -- remove the heading
+          doc.blocks:remove(i)
           break
+        elseif doc.blocks[i].t == 'Div' and 
+          doc.blocks[i].identifier == 'refs-preamble' then
+            references:extend(pandoc.MetaBlocks( doc.blocks[i].content ))
+            doc.blocks:remove(i)
         else
           break
         end

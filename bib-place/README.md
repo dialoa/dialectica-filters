@@ -7,11 +7,21 @@ Bib-place
 =======
 
 Control the placement of a `citeproc`-generated bibliography
-via Pandoc templates. Only works with a single-bibliography
-document.
+via Pandoc templates. 
+
+__Deprecated__. We recommend following the [suggestion in Pandoc's user
+guide](https://pandoc.org/MANUAL.html#placement-of-the-bibliography):
+put a Div with `#refs` id in a metadata field. The filter is kept here
+because Dialectica processes use it.
+
+* Automatically picks a reference header.
+* Using custom  syntax, can also pick a header with a preamble.
+* Not compatible with filters for multiple bibliographies such as
+  [multibib](https://github.com/pandoc-ext/multibib). 
 
 The filter does not affect biblatex / natbib outputs, so it can be
-used with a custom template that caters for all bibliography engines.
+used with a custom template that caters for all bibliography
+engines.
 
 Introduction
 ------------
@@ -42,8 +52,11 @@ places it in a `$referencesblock$` variable instead.
 Usage
 ----
 
-Call the filter at the command line or in a defaults file (see Pandoc's
-manual for detail). **Important**: the filter must be called after *citeproc*. From the command line:
+### Basic usage
+
+Call the filter at the command line or in a defaults file (see
+Pandoc's manual for detail). **Important**: the filter must be
+called after *citeproc*. From the command line:
 
 ```
 pandoc -s --citeproc -L bib-place.lua sample.md -t html
@@ -59,7 +72,8 @@ filters:
 - bib-place.lua
 ```
 
-In you custom Pandoc template you can then place the references block with the `referencesblock` variable:
+In you custom Pandoc template you can then place the references
+block with the `referencesblock` variable:
 
 ```
 $body$
@@ -72,11 +86,33 @@ $endif$
 $if(referencesblock)$$referencesblock$$endif$
 ```
 
+### Customization
+
+The filter automatically picks a Header block appearing just before
+the references. To include multiple blocks including a bibliography
+premable, use a Div with id `refs-preamble`:
+
+``` markdown
+
+::: {#refs-preamble}
+
+## Works cited
+
+This should come before references.
+
+:::
+
+```
+
 Notes
 -----
 
-The template can be agnostic on which bibliography engine your run. If you process the document with other bibliography engines (natbib, biblatex) the filter will leave them untouched and you can place them by moving the
-`\printbibliography` commands in the template.
+The template can be agnostic on which bibliography engine your
+run. If you process the document with other bibliography engines
+(natbib, biblatex) the filter will leave them untouched and you
+can place them by moving the `\printbibliography` commands in the
+template.
 
-If you use the filter with the default pandoc templates or with a template
-that does not use `$referencesblock$` your bibliography will not be printed.
+If you use the filter with the default pandoc templates or with a
+template that does not use `$referencesblock$` your bibliography
+will not be printed.
