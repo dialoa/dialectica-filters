@@ -14,7 +14,6 @@
 --Scan body from last block backwards, look for the `refs` Div,
 --If present, check the element right before and pick
 --it up if it's a header or a `refs-preamble` Div.
---The `refs-preamble` Div is dissolved.
 -- @param element a Div element
 -- @return an empty list if Div has identifier `refs`
 Pandoc = function (doc)
@@ -34,7 +33,7 @@ Pandoc = function (doc)
         break
 
       elseif doc.blocks[i].t == 'Div' and 
-      doc.blocks[i].identifier == 'refs-preamble' then
+      doc.blocks[i].classes:includes('refs-preamble') then
 
         preamble = pandoc.MetaBlocks({doc.blocks[i]})
         doc.blocks:remove(i)

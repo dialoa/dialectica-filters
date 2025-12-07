@@ -90,11 +90,11 @@ $if(referencesblock)$$referencesblock$$endif$
 
 The filter automatically picks a Header block appearing just before
 the references. To include multiple blocks including a bibliography
-premable, use a Div with id `refs-preamble`:
+premable, use a Div with class `refs-preamble`:
 
 ``` markdown
 
-::: {#refs-preamble}
+::: {.refs-preamble}
 
 ## Works cited
 
@@ -106,10 +106,14 @@ This should come before references.
 
 ```
 
-Typically, you need to add a blank line to separate your 
-preamble from references. This is done above with an paragraph
-only containing an escaped end of line: `\` on a line of its
-one (directly followed by a linebreak, no space).
+You will typically need to add space between your preamble and
+references in HTML, perhaps also in LaTeX. A quick hack,
+demonstrated above, to add a paragraph only containing an escaped
+end of line: `\` on a line of its one (directly followed by a
+linebreak, no space). A better approach in html is to style
+`csl-bib-body` or `refs-preamble` . (Styling the latter allows you
+to only target documents that have a bibliography preamble.) In
+LaTeX, you need to adjust your template.
 
 Notes
 -----
